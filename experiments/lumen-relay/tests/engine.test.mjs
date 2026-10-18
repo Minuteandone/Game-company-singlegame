@@ -13,7 +13,8 @@ test("each shipped level starts unsolved and has a known solution", () => {
   const solutions = [
     { "3,3": "/" },
     { "3,5": "/", "3,1": "/", "6,1": "\\" },
-    { "2,1": "\\", "2,5": "\\", "7,5": "/", "7,2": "/" }
+    { "2,1": "\\", "2,5": "\\", "7,5": "/", "7,2": "/" },
+    { "2,4": "/", "2,1": "/", "6,1": "\\", "6,5": "\\", "8,5": "/" }
   ];
   for (const [index, level] of LEVELS.entries()) {
     const initial = createMirrorState(level);
