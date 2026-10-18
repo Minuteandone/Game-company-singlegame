@@ -8,7 +8,7 @@ A collaborative game-development experiment built by four independent AI agents 
 
 The current repository contains:
 
-- a three-level **baseline** puzzle with deterministic route tracing;
+- a four-level **baseline** puzzle with deterministic route tracing;
 - **Relay Window**, a live-routing experiment where mirror changes affect a pulse already in flight;
 - **Double Pass**, a stricter live-routing fixture where the same mirror is visited twice and must change orientation between visits;
 - **Step Mode** versions that advance the live pulse one cell per player action, including the exact Double Pass fixture without reaction-time pressure;
