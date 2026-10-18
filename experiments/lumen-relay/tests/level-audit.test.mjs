@@ -15,6 +15,18 @@ test('each authored puzzle has exactly one winning state and a 1→2→3 turn pr
   }
 });
 
+test('The Long Bloom has one solution requiring four turns across five mirrors', () => {
+  const level = LEVELS.find(item => item.id === 'the-long-bloom');
+  assert.ok(level, 'The Long Bloom must exist');
+  const audit = auditLevel(level);
+  assert.equal(audit.mirrorCount, 5);
+  assert.equal(audit.testedConfigurations, 32);
+  assert.equal(audit.winningCount, 1);
+  assert.equal(audit.minTurnsToWin, 4);
+  assert.deepEqual(audit.exampleSolution.flippedKeys, ['2,4', '2,1', '6,1', '6,5']);
+  assert.equal(audit.exampleSolution.orientations['8,5'], '/', 'final mirror stays aligned');
+});
+
 test('later authored puzzles remain solvable and initially unsolved', () => {
   for (const level of LEVELS.slice(3)) {
     const audit = auditLevel(level);
