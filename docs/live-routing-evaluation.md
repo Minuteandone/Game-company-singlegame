@@ -18,7 +18,7 @@ The live variants share the same one-cell routing engine and baseline reflection
 
 ## Test plan
 
-When serving `experiments/lumen-relay/` locally, open `evaluate.html` for a local-only observation recorder aligned to this protocol. It can open each candidate, save sessions in browser local storage, copy a structured Issue #8 report, and copy a **coverage summary** of all locally saved sessions. The summary distinguishes records that were merely saved from sessions that were actually completed, attempted, or observed. Neutral `not recorded` placeholders do **not** count toward matched Double Pass coverage, environment coverage, or evidence-direction counts. The summary does not score qualitative notes, upload anything, or choose a verdict automatically.
+When serving `experiments/lumen-relay/` locally, open `compare.html` for the matched comparison guide and `evaluate.html` for the local-only observation recorder aligned to this protocol. The guide keeps baseline play as context and presents two Double Pass orders (timed → step and step → timed); alternate those orders across testers when practical to reduce learning/order effects. It can open each candidate, save sessions in browser local storage, copy a structured Issue #8 report, and copy a **coverage summary** of all locally saved sessions. The summary distinguishes records that were merely saved from sessions that were actually completed, attempted, or observed. Neutral `not recorded` placeholders do **not** count toward matched Double Pass coverage, environment coverage, or evidence-direction counts. The summary does not score qualitative notes, upload anything, or choose a verdict automatically.
 
 For each candidate, use the same device, input method, and a fresh play session. Do not explain the solution in advance.
 
@@ -55,7 +55,12 @@ Record whether the repeated visit is legible before reading the hint, and whethe
 
 Solve the live-routing logic using explicit Advance actions. Compare Relay Window with its step-mode version, then compare timed Double Pass directly against **Double Pass · Step Mode**.
 
-For the Double Pass pair, keep the geometry and solution constant and change only pacing:
+For the Double Pass pair, keep the geometry and solution constant and change only pacing. Alternate which version comes first across testers when practical; otherwise a player may simply perform better in whichever version they encounter second because they already learned the route.
+
+- Use **Sequence A** for some testers: timed Double Pass → Double Pass Step.
+- Use **Sequence B** for others: Double Pass Step → timed Double Pass.
+
+Then ask:
 - Is the repeated-mirror rule understandable in both modes?
 - Does real-time timing add anticipation, or mostly input pressure?
 - Does player-paced stepping make cause-and-effect clearer?

@@ -13,6 +13,7 @@ The current repository contains:
 - **Double Pass**, a stricter live-routing fixture where the same mirror is visited twice and must change orientation between visits;
 - **Step Mode** versions that advance the live pulse one cell per player action, including the exact Double Pass fixture without reaction-time pressure;
 - a **five-mode launcher** that makes the complete comparison set discoverable from one page;
+- a **counterbalanced matched-comparison guide** for the timed and player-paced Double Pass pair;
 - a local-only playtest recorder for structured Issue #8 observations;
 - automated engine, integration, authored-level, accessibility-semantics, and real-browser smoke coverage;
 - shared design and evaluation documents.
@@ -21,7 +22,7 @@ The prototype is intentionally reversible. The repository does **not** yet recor
 
 ## Play online
 
-GitHub Pages publishes the project at **[Play Lumen Relay](https://minuteandone.github.io/Game-company-singlegame/)**. The repository-root homepage links to the [five-mode launcher](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/modes.html), the original puzzle, and the local-only playtest recorder.
+GitHub Pages publishes the project at **[Play Lumen Relay](https://minuteandone.github.io/Game-company-singlegame/)**. The repository-root homepage links to the [five-mode launcher](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/modes.html), the [matched comparison guide](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/compare.html), the original puzzle, and the local-only playtest recorder.
 
 The game runs as static HTML and browser ES modules; no account or backend is required. Site availability depends on the latest successful GitHub Pages deployment.
 
@@ -43,6 +44,7 @@ Or open a specific page:
 | Variant | Local page | Purpose |
 | --- | --- | --- |
 | Mode launcher | `http://localhost:8000/modes.html` | Discover and compare all five playable variants |
+| Matched comparison guide | `http://localhost:8000/compare.html` | Counterbalance timed-vs-step Double Pass order across testers |
 | Baseline | `http://localhost:8000/` | Static mirror planning and precomputed pulse playback |
 | Relay Window | `http://localhost:8000/spikes/live-routing.html` | Simple in-flight mirror changes |
 | Double Pass | `http://localhost:8000/spikes/double-pass.html` | Forced between-visits mirror change |
@@ -75,7 +77,7 @@ Implementation correctness is tested, but correctness is not the same thing as f
 
 Use `http://localhost:8000/evaluate.html` to record a structured observation session locally and copy a ready-to-paste Issue #8 report. The recorder sends nothing automatically and preserves a visible/selectable report if clipboard access is blocked.
 
-For the cleanest pacing comparison, play **Double Pass** and **Double Pass · Step Mode**: they use the same puzzle geometry and route rules, with real-time versus player-paced advancement as the main variable.
+For the cleanest pacing comparison, use `compare.html`. It keeps the three-level baseline as context, then provides both **timed → step** and **step → timed** Double Pass sequences so facilitators can alternate order across testers. The Double Pass pair uses the same puzzle geometry and route rules, with real-time versus player-paced advancement as the main variable.
 
 The current decision gate is documented in:
 
