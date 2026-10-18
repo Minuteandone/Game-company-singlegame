@@ -155,6 +155,11 @@ h1 em { color: var(--gold); font-style: normal; }
   background: #1f4a4b;
 }
 
+.tile--live.visited {
+  border-color: #fff0bf;
+  background: var(--gold);
+}
+
 .tile.current {
   border-color: #e8fff7;
   background: #78d6c3;
