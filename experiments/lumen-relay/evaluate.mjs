@@ -169,7 +169,7 @@ function resetForm() {
   for (const id of ["discoverability", "causal", "movement", "fairness", "accessibility", "replay", "notes"]) {
     elements[id].value = "";
   }
-  elements.result.value = "completed";
+  elements.result.value = "not recorded";
   elements.verdict.value = "inconclusive";
   setStatus("Observation fields cleared.");
 }
