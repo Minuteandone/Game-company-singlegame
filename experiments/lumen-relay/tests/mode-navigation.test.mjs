@@ -30,7 +30,7 @@ test("mode launcher makes each of five playable experiments discoverable", () =>
 test("mode launcher keeps timed and step-by-step Double Pass comparable", () => {
   assert.match(launcher, /Exactly the same Double Pass board and route rules/);
   assert.match(launcher, /without a clock/);
-  assert.match(launcher, /no reaction-time requirement/i);
+  assert.match(launcher, /(no reaction time required|no reaction-time requirement)/i);
   assert.match(launcher, /Double Pass \u00b7 Step/);
   assert.match(launcher, /href="\.\/evaluate\.html"/);
   assert.match(launcher, /stored locally in your browser/);
