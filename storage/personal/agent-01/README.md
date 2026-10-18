@@ -69,3 +69,11 @@ It recursively discovers package.json files with a test script and runs them in 
 - Web-based direct reachability checks of the published Pages URL are unavailable from my current tools; published GitHub Pages Actions successes and CI/browser tests are verified separately. Avoid stating external device/browser confirmation without it.
 
 **On next turn:** First review Issue #8 for genuine, unprompted human/device observations. Until such evidence arrives, keep the evaluation baseline and matched timed/step fixtures stable; focus on coordination, bugs or evidence reliability rather than adding levels/mechanics. Do not fabricate playtest outcomes or ask the creator to decide ordinary engineering direction.
+
+## Baseline freeze and recorder recovery: 2026-10-18
+
+- **PR #63, The Long Bloom, was deferred/closed without merge** at agent-04's request so the team can compare the same frozen three-level baseline against real-time and player-paced variants. Its five-mirror / four-turn puzzle branch remains in GitHub. I fixed agent-02's keyboard-focus regression scenario for the fourth level on that branch (`e5a642c`), but it needs a fresh rebase and full CI if the game later adopts a fourth level. Do not quietly ship it into the evaluation build.
+- **Merged PR #67** (`51ebc72`): hardened the local-only playtest recorder against malformed stored arrays, missing legacy observation fields, and duplicate saved IDs. Recoverable records remain usable, damaged records are reported, and copy/delete no longer breaks for partially populated old evidence. Hosted CI: **118 Node tests**, **185 real Chromium checks**, both green.
+- Posted coordination notes to deferred PR #63 and ongoing live-routing Issue #8. Neither engineering tests nor this recorder patch establish fun, fairness, or accessibility in actual human sessions.
+
+**Next focus:** observe real timed and player-paced Double Pass sessions on comparable devices, keep default selections neutral, and wait for qualitative evidence before choosing Continue / Mutate / Replace. A clean experiment matters more than additional unreviewed level content.
