@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Orbit Switch — agent-03 prototype</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #090b12; }
+  body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: manipulation; cursor: pointer; }
+  .note {
+    position: fixed; left: 12px; bottom: 10px; color: rgba(255,255,255,.45);
+    font-size: 11px; pointer-events: none; user-select: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div class="note">agent-03 (AI agent) • prototype</div>
+<script>
+(() => {
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d");
+
+  let W = 0, H = 0, DPR = 1;
+  let anchors = [];
+  let player, sparks, hazards, score, started, dead, timeAlive;
+  let sparkTimer, hazardTimer, switchCooldown, flash;
+  let last = performance.now();
+
+  const TAU = Math.PI * 2;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function resize() {
+    DPR = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth;
+    H = innerHeight;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    const spread = clamp(W * 0.22, 110, 240);
+    anchors = [
+      { x: W / 2 - spread, y: H / 2 },
+      { x: W / 2 + spread, y: H / 2 }
+    ];
+
+    if (player && !dead) {
+      const a = anchors[player.anchor];
+      player.radius = clamp(player.radius, 64, Math.max(90, Math.min(W, H) * 0.34));
+      player.x = a.x + Math.cos(player.angle) * player.radius;
+      player.y = a.y + Math.sin(player.angle) * player.radius;
+    }
+  }
+
+  function reset() {
+    score = 0;
+    started = false;
+    dead = false;
+    timeAlive = 0;
+    sparkTimer = 0.4;
+    hazardTimer = 1.1;
+    switchCooldown = 0;
+    flash = 0;
+    sparks = [];
+    hazards = [];
+
+    const radius = clamp(Math.min(W, H) * 0.16, 70, 115);
+    player = {
+      anchor: 0,
+      angle: -Math.PI / 2,
+      radius,
+      targetRadius: radius,
+      orbitSpeed: 1.95,
+      x: 0,
+      y: 0
+    };
+    updatePlayerPosition();
+    spawnSpark(true);
+  }
+
+  function updatePlayerPosition() {
+    const a = anchors[player.anchor];
+    player.x = a.x + Math.cos(player.angle) * player.radius;
+    player.y = a.y + Math.sin(player.angle) * player.radius;
+  }
+
+  function switchAnchor() {
+    if (dead) {
+      reset();
+      started = true;
+      return;
+    }
+    started = true;
+    if (switchCooldown > 0) return;
+    switchCooldown = 0.14;
+
+    const next = 1 - player.anchor;
+    const a = anchors[next];
+    const dx = player.x - a.x;
+    const dy = player.y - a.y;
+    player.anchor = next;
+    player.angle = Math.atan2(dy, dx);
+    player.radius = clamp(Math.hypot(dx, dy), 50, Math.min(W, H) * 0.46);
+    player.targetRadius = clamp(Math.min(W, H) * 0.16, 70, 115);
+    flash = 0.16;
+  }
+
+  function spawnSpark(initial = false) {
+    const ai = Math.random() < 0.5 ? 0 : 1;
+    const a = anchors[ai];
+    const base = clamp(Math.min(W, H) * 0.16, 70, 115);
+    const angle = initial ? Math.PI * 0.10 : rand(0, TAU);
+    const radius = base * rand(0.82, 1.18);
+    sparks.push({
+      x: a.x + Math.cos(angle) * radius,
+      y: a.y + Math.sin(angle) * radius,
+      life: initial ? 99 : 8,
+      pulse: rand(0, TAU)
+    });
+  }
+
+  function spawnHazard() {
+    const ai = Math.random() < 0.5 ? 0 : 1;
+    const a = anchors[ai];
+    const base = clamp(Math.min(W, H) * 0.16, 70, 115);
+    const radius = base * rand(0.78, 1.24);
+    hazards.push({
+      anchor: ai,
+      angle: rand(0, TAU),
+      radius,
+      speed: rand(1.25, 2.15) * (Math.random() < 0.5 ? -1 : 1),
+      size: rand(8, 13),
+      life: 9,
+      x: a.x,
+      y: a.y
+    });
+  }
+
+  function dist2(ax, ay, bx, by) {
+    const dx = ax - bx, dy = ay - by;
+    return dx * dx + dy * dy;
+  }
+
+  function endGame() {
+    dead = true;
+    const best = Number(localStorage.getItem("orbit-switch-best") || 0);
+    if (score > best) localStorage.setItem("orbit-switch-best", String(score));
+  }
+
+  function update(dt) {
+    switchCooldown = Math.max(0, switchCooldown - dt);
+    flash = Math.max(0, flash - dt);
+    if (!started || dead) return;
+
+    timeAlive += dt;
+    player.angle += player.orbitSpeed * dt;
+    player.radius += (player.targetRadius - player.radius) * Math.min(1, dt * 3.5);
+    updatePlayerPosition();
+
+    sparkTimer -= dt;
+    if (sparkTimer <= 0 && sparks.length < 3) {
+      spawnSpark();
+      sparkTimer = rand(1.2, 2.2);
+    }
+
+    hazardTimer -= dt;
+    if (hazardTimer <= 0) {
+      spawnHazard();
+      const difficulty = clamp(timeAlive / 55, 0, 0.58);
+      hazardTimer = rand(0.85, 1.35) * (1 - difficulty);
+    }
+
+    for (const s of sparks) {
+      s.life -= dt;
+      s.pulse += dt * 5;
+    }
+    sparks = sparks.filter(s => {
+      if (dist2(player.x, player.y, s.x, s.y) < 20 * 20) {
+        score += 1;
+        flash = 0.10;
+        return false;
+      }
+      return s.life > 0;
+    });
+
+    for (const h of hazards) {
+      h.life -= dt;
+      h.angle += h.speed * dt;
+      const a = anchors[h.anchor];
+      h.x = a.x + Math.cos(h.angle) * h.radius;
+      h.y = a.y + Math.sin(h.angle) * h.radius;
+      const hit = h.size + 8;
+      if (dist2(player.x, player.y, h.x, h.y) < hit * hit) endGame();
+    }
+    hazards = hazards.filter(h => h.life > 0);
+  }
+
+  function drawAnchor(a, active) {
+    ctx.save();
+    ctx.translate(a.x, a.y);
+    ctx.strokeStyle = active ? "rgba(93,226,255,.55)" : "rgba(255,255,255,.16)";
+    ctx.lineWidth = active ? 2 : 1;
+    ctx.beginPath();
+    ctx.arc(0, 0, 12, 0, TAU);
+    ctx.stroke();
+
+    ctx.fillStyle = active ? "rgba(93,226,255,.9)" : "rgba(255,255,255,.28)";
+    ctx.beginPath();
+    ctx.arc(0, 0, active ? 4 : 3, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * .65);
+    grad.addColorStop(0, flash > 0 ? "#101d27" : "#10131d");
+    grad.addColorStop(1, "#07090f");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    const active = anchors[player.anchor];
+    ctx.strokeStyle = "rgba(93,226,255,.11)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(active.x, active.y, player.targetRadius, 0, TAU);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(93,226,255,.17)";
+    ctx.setLineDash([4, 8]);
+    ctx.beginPath();
+    ctx.moveTo(anchors[0].x, anchors[0].y);
+    ctx.lineTo(anchors[1].x, anchors[1].y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    drawAnchor(anchors[0], player.anchor === 0);
+    drawAnchor(anchors[1], player.anchor === 1);
+
+    for (const s of sparks) {
+      const r = 5 + Math.sin(s.pulse) * 1.4;
+      ctx.shadowColor = "#64efff";
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = "#7cf3ff";
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, r, 0, TAU);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    for (const h of hazards) {
+      ctx.save();
+      ctx.translate(h.x, h.y);
+      ctx.rotate(h.angle * 1.7);
+      ctx.fillStyle = "#ff5574";
+      ctx.shadowColor = "#ff3159";
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, -h.size);
+      ctx.lineTo(h.size * .72, h.size);
+      ctx.lineTo(-h.size * .72, h.size);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.strokeStyle = "rgba(124,243,255,.35)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(active.x, active.y);
+    ctx.lineTo(player.x, player.y);
+    ctx.stroke();
+
+    ctx.shadowColor = "#ffffff";
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = "#f5fbff";
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, 8, 0, TAU);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = "rgba(255,255,255,.82)";
+    ctx.font = "600 16px ui-monospace, monospace";
+    ctx.fillText("SPARKS " + score, 18, 30);
+
+    ctx.fillStyle = "rgba(255,255,255,.38)";
+    ctx.font = "12px ui-monospace, monospace";
+    ctx.fillText("SPACE / CLICK / TAP = SWITCH", 18, 50);
+
+    if (!started) overlay(
+      "ORBIT SWITCH",
+      "Switch anchors. Collect cyan. Avoid red.",
+      "PRESS SPACE OR CLICK"
+    );
+
+    if (dead) {
+      const best = Math.max(score, Number(localStorage.getItem("orbit-switch-best") || 0));
+      overlay(
+        "CRASHED",
+        "sparks " + score + "  •  best " + best,
+        "CLICK / SPACE TO RESTART"
+      );
+    }
+  }
+
+  function overlay(title, sub, action) {
+    ctx.fillStyle = "rgba(5,7,12,.64)";
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#f4fbff";
+    ctx.font = "700 " + clamp(W * .055, 28, 56) + "px ui-monospace, monospace";
+    ctx.fillText(title, W/2, H/2 - 32);
+
+    ctx.fillStyle = "rgba(255,255,255,.62)";
+    ctx.font = "14px ui-monospace, monospace";
+    ctx.fillText(sub, W/2, H/2 + 4);
+
+    ctx.fillStyle = "#7cf3ff";
+    ctx.font = "700 13px ui-monospace, monospace";
+    ctx.fillText(action, W/2, H/2 + 44);
+    ctx.textAlign = "left";
+  }
+
+  function frame(now) {
+    const dt = Math.min((now - last) / 1000, 0.033);
+    last = now;
+    update(dt);
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  addEventListener("resize", resize);
+  addEventListener("keydown", e => {
+    if (e.code === "Space") {
+      e.preventDefault();
+      switchAnchor();
+    } else if (e.code === "KeyR" && dead) {
+      reset();
+      started = true;
+    }
+  });
+  canvas.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    switchAnchor();
+  });
+
+  resize();
+  reset();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
