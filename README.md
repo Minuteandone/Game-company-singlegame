@@ -12,7 +12,9 @@ The current repository contains:
 - **Relay Window**, a live-routing experiment where mirror changes affect a pulse already in flight;
 - **Double Pass**, a stricter live-routing fixture where the same mirror is visited twice and must change orientation between visits;
 - **Step Mode** versions that advance the live pulse one cell per player action, including the exact Double Pass fixture without reaction-time pressure;
-- automated engine, integration, real-browser smoke, UI-parse, and authored-level audit tests;
+- a **five-mode launcher** that makes the complete comparison set discoverable from one page;
+- a local-only playtest recorder for structured Issue #8 observations;
+- automated engine, integration, authored-level, accessibility-semantics, and real-browser smoke coverage;
 - shared design and evaluation documents.
 
 The prototype is intentionally reversible. The repository does **not** yet record a final decision to keep static routing, mutate the game around live routing, or replace the concept.
@@ -26,10 +28,15 @@ cd experiments/lumen-relay
 python3 -m http.server 8000
 ```
 
-Then open:
+For the easiest starting point, open the mode launcher:
+
+`http://localhost:8000/modes.html`
+
+Or open a specific page:
 
 | Variant | Local page | Purpose |
 | --- | --- | --- |
+| Mode launcher | `http://localhost:8000/modes.html` | Discover and compare all five playable variants |
 | Baseline | `http://localhost:8000/` | Static mirror planning and precomputed pulse playback |
 | Relay Window | `http://localhost:8000/spikes/live-routing.html` | Simple in-flight mirror changes |
 | Double Pass | `http://localhost:8000/spikes/double-pass.html` | Forced between-visits mirror change |
@@ -54,13 +61,15 @@ Or run every discoverable experiment test package from the repository root:
 node scripts/verify.mjs
 ```
 
-The repository also has GitHub Actions checks for the Lumen Relay package, repository-wide verifier, and a headless Chromium smoke test of the production baseline UI.
+GitHub Actions also run the scoped Lumen suite, the repository-wide verifier, and a real headless-Chromium smoke flow. The browser harness exercises the baseline progression, both Step Mode puzzles, both timed live-routing puzzles, recorder persistence, narrow-screen touch-target geometry, and cancellation/reset behavior.
 
 ## Evaluation status
 
 Implementation correctness is tested, but correctness is not the same thing as fun or usability.
 
-Use `http://localhost:8000/evaluate.html` to record a structured observation session locally and copy a ready-to-paste Issue #8 report. The recorder sends nothing automatically.
+Use `http://localhost:8000/evaluate.html` to record a structured observation session locally and copy a ready-to-paste Issue #8 report. The recorder sends nothing automatically and preserves a visible/selectable report if clipboard access is blocked.
+
+For the cleanest pacing comparison, play **Double Pass** and **Double Pass · Step Mode**: they use the same puzzle geometry and route rules, with real-time versus player-paced advancement as the main variable.
 
 The current decision gate is documented in:
 
@@ -68,7 +77,7 @@ The current decision gate is documented in:
 - [Live-routing evaluation protocol](docs/live-routing-evaluation.md)
 - [Live-routing experiment notes](experiments/lumen-relay/spikes/README.md)
 
-The live-routing experiment is currently **ready for evaluation**. A Continue / Mutate / Replace verdict should wait for actual browser/device observations about discoverability, timing fairness, keyboard and touch use, nonvisual state information, and whether players prefer the mechanic.
+The live-routing experiment is **engineering-ready for evaluation**. A Continue / Mutate / Replace verdict should wait for actual human/device observations about discoverability, timing fairness, real touch comfort, screen-reader comprehension, replay interest, and player preference.
 
 ## Repository map
 
