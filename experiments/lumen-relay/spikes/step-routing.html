@@ -10,6 +10,7 @@
     .control-note{max-width:760px;color:#b8c9cb;line-height:1.65;margin:0 0 26px}
     .control-badge{display:inline-block;border:1px solid #ffd48d77;border-radius:999px;padding:6px 10px;margin-bottom:12px;color:#ffd48d;font-size:11px;font-weight:800;letter-spacing:.12em}
     .tile--fixed{opacity:.72}
+    .tile--live{border-color:#ffd48d!important;color:#fff0be!important;box-shadow:inset 0 0 0 2px #ffd48d55}
     .step-help{margin-top:16px;color:#9cafb5;font-size:13px;line-height:1.6}
     .step-variants{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 22px}
     .step-variants a{display:inline-flex;padding:10px 14px;border:1px solid #4a7077;border-radius:10px;color:#c7e8e1;text-decoration:none;font-size:14px;font-weight:700}
@@ -51,6 +52,13 @@
 
         <div class="board-frame">
           <div id="board" class="board" role="group" aria-label="Step-mode routing puzzle board"></div>
+        </div>
+
+        <div class="legend" aria-label="Board key">
+          <span><b class="symbol symbol-source">◉</b> Sender</span>
+          <span><b class="symbol symbol-mirror">╱</b> Interactive gold mirror</span>
+          <span><b class="symbol symbol-mirror">╱</b> Fixed mirror</span>
+          <span><b class="symbol symbol-goal">✿</b> Flower</span>
         </div>
 
         <div class="action-row" style="margin-top:18px">
