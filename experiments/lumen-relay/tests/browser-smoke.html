@@ -81,6 +81,8 @@
         boardFrame.clientWidth + '/' + boardFrame.scrollWidth +
         ', viewport ' + frame.contentWindow.innerWidth +
         ', page ' + doc.documentElement.scrollWidth);
+      check(doc.documentElement.scrollWidth <= doc.documentElement.clientWidth + 1,
+        'Mobile page itself horizontally overflows instead of containing board scroll');
       const mirror = cell(doc, mirrorKey);
       const rect = mirror.getBoundingClientRect();
       check(rect.width >= 44 && rect.height >= 44,
