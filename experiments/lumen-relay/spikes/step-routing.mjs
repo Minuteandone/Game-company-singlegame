@@ -1,6 +1,7 @@
 import { createMirrorState, positionKey, rotateMirror } from "../src/engine.mjs";
 import { advanceLivePulse, createLivePulse } from "./live-engine.mjs";
 import { LIVE_LEVEL } from "./live-level.mjs";
+import { createStepSession } from "./step-session.mjs";
 
 const byId = id => document.getElementById(id);
 const elements = {
@@ -15,11 +16,19 @@ const elements = {
 };
 
 const liveKeys = new Set(LIVE_LEVEL.liveMirrorKeys);
+const session = createStepSession(
+  LIVE_LEVEL,
+  {
+    initialPulse: createLivePulse,
+    stepPulse: (level, pulse, mirrors) => advanceLivePulse(level, mirrors, pulse)
+  },
+  createMirrorState(LIVE_LEVEL)
+);
 const state = {
-  mirrors: createMirrorState(LIVE_LEVEL),
-  pulse: createLivePulse(LIVE_LEVEL),
   begun: false,
-  turns: 0
+  turns: 0,
+  get mirrors() { return session.snapshot.mirrors; },
+  get pulse() { return session.snapshot.pulse; }
 };
 
 let tiles = new Map();
@@ -81,7 +90,7 @@ function renderBoard() {
           tile.disabled = !state.begun || Boolean(state.pulse.outcome);
           tile.addEventListener("click", () => {
             if (!state.begun || state.pulse.outcome) return;
-            state.mirrors = rotateMirror(state.mirrors, x, y);
+            session.rotate(rotateMirror(state.mirrors, x, y));
             state.turns += 1;
             tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
             tile.setAttribute("aria-label", mirrorLabel(x, y, key));
@@ -134,8 +143,7 @@ function syncControls() {
 }
 
 function reset() {
-  state.mirrors = createMirrorState(LIVE_LEVEL);
-  state.pulse = createLivePulse(LIVE_LEVEL);
+  session.reset(createMirrorState(LIVE_LEVEL));
   state.begun = false;
   state.turns = 0;
   renderBoard();
@@ -145,8 +153,7 @@ function reset() {
 }
 
 function begin() {
-  state.mirrors = createMirrorState(LIVE_LEVEL);
-  state.pulse = createLivePulse(LIVE_LEVEL);
+  session.reset(createMirrorState(LIVE_LEVEL));
   state.begun = true;
   state.turns = 0;
   renderBoard();
@@ -157,7 +164,7 @@ function begin() {
 
 function advance() {
   if (!state.begun || state.pulse.outcome) return;
-  state.pulse = advanceLivePulse(LIVE_LEVEL, state.mirrors, state.pulse);
+  session.advance();
   paintPulse();
   updateCounters();
 
