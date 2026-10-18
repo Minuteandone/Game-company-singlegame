@@ -106,6 +106,8 @@
         check(doc.querySelectorAll('#board button').length === 1,
           'First level should introduce exactly one mirror');
         check(doc.getElementById('next').hidden, 'Next button visible before win');
+        check(doc.getElementById('explore-after-win').hidden,
+          'Mode launcher completion link visible before final win');
         check(doc.getElementById('sound').getAttribute('aria-pressed') === 'false',
           'Sound must default off');
         check(doc.getElementById('undo').disabled, 'Undo should start disabled');
@@ -124,6 +126,8 @@
         rotate(doc, '3,3');
         await shoot(doc, 'win');
         check(!doc.getElementById('next').hidden, 'Next button missing after first win');
+        check(doc.getElementById('explore-after-win').hidden,
+          'Mode launcher completion link visible after first win');
 
         doc.getElementById('next').click();
         check(doc.getElementById('level-title').textContent === 'The Detour',
@@ -131,6 +135,8 @@
         rotate(doc, '3,5');
         rotate(doc, '6,1');
         await shoot(doc, 'win');
+        check(doc.getElementById('explore-after-win').hidden,
+          'Mode launcher completion link visible after second win');
 
         doc.getElementById('next').click();
         check(doc.getElementById('level-title').textContent === 'Crossed Wires',
@@ -141,10 +147,16 @@
         await shoot(doc, 'win');
         check(doc.getElementById('next').textContent.includes('Play again'),
           'Completion replay control missing');
+        const explore = doc.getElementById('explore-after-win');
+        check(!explore.hidden, 'Mode launcher completion link missing after final win');
+        check(explore.getAttribute('href') === './modes.html',
+          'Mode launcher completion link points to the wrong page');
 
         doc.getElementById('next').click();
         check(doc.getElementById('level-title').textContent === 'First Light',
           'Replay did not return to first puzzle');
+        check(doc.getElementById('explore-after-win').hidden,
+          'Mode launcher completion link stayed visible after replay');
         doc.getElementById('fire').click();
         doc.getElementById('reset').click();
         check(doc.getElementById('shots').textContent === '0',
