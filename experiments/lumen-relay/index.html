@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101e28">
+  <meta name="description" content="Lumen Relay — a tiny light-routing puzzle experiment.">
+  <title>Lumen Relay — Signal Garden</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/main.mjs"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="Lumen Relay home"><span class="brand-mark">✳</span> LUMEN LAB</a>
+      <div class="topbar-actions">
+        <span class="prototype-tag">PLAYABLE EXPERIMENT 01</span>
+        <button id="sound" class="ghost sound-toggle" type="button" aria-pressed="false">♪ Sound off</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="intro">
+        <div class="eyebrow"><span class="small-star">✦</span> A LITTLE LIGHT GOES A LONG WAY</div>
+        <h1>Lumen <span>Relay.</span></h1>
+        <p>Turn the mirrors. Follow the glow. Wake the sleeping flower. Three tiny puzzles about finding your way through the dark.</p>
+      </div>
+
+      <div class="play-layout">
+        <section class="game-card" aria-label="Lumen Relay puzzle">
+          <div class="game-head">
+            <div>
+              <p id="chapter" class="chapter">PUZZLE 01 / 03</p>
+              <h2 id="level-title">First Light</h2>
+              <p id="level-subtitle" class="level-subtitle">Two turns can wake a sleeping bloom.</p>
+            </div>
+            <div class="counter-stack" aria-label="Play statistics">
+              <span>SHOTS <strong id="shots">0</strong></span>
+              <span>TURNS <strong id="turns">0</strong></span>
+            </div>
+          </div>
+
+          <div class="board-frame">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-br"></div>
+            <div id="board" class="board" role="group" aria-label="Light routing puzzle board"></div>
+          </div>
+          <div class="legend" aria-label="Board key">
+            <span><b class="symbol symbol-source">◉</b> Sender</span>
+            <span><b class="symbol symbol-mirror">╱</b> Rotatable mirror</span>
+            <span><b class="symbol symbol-goal">✿</b> Flower</span>
+            <span><b class="symbol symbol-wall">■</b> Stone</span>
+          </div>
+
+          <div class="action-row">
+            <button id="fire" class="primary" type="button"><span aria-hidden="true">➜</span> Send pulse</button>
+            <button id="reset" class="secondary" type="button">↺ Reset</button>
+            <button id="hint" class="secondary" type="button">Hint</button>
+            <button id="next" class="primary next" type="button" hidden>Next puzzle →</button>
+          </div>
+          <p id="status" class="status" role="status" aria-live="polite" data-state="ready">Click a mirror to rotate it, then send a pulse.</p>
+        </section>
+
+        <aside class="side-panel" aria-label="How to play">
+          <div class="orb" aria-hidden="true"><div class="orb-core">✺</div></div>
+          <p class="eyebrow">THE FIELD GUIDE</p>
+          <h2>A path isn't always a straight line.</h2>
+          <div class="rule"><span>01</span><p>Tap or click a <strong>mirror</strong> to change its angle.</p></div>
+          <div class="rule"><span>02</span><p>Press <strong>Send pulse</strong> to see where the beam travels.</p></div>
+          <div class="rule"><span>03</span><p>Reach the <strong>flower</strong> to bring the garden to life.</p></div>
+          <div class="key-guide">Keyboard: <kbd>Tab</kbd> between mirrors · <kbd>Enter</kbd> to turn · <kbd>P</kbd> to pulse · <kbd>R</kbd> to reset</div>
+          <div class="quote">“Even small signals deserve to be heard.”</div>
+        </aside>
+      </div>
+    </main>
+    <footer>AN OPEN GAME COMPANY EXPERIMENT <span>✦</span> BUILT BY <strong>agent-02 (AI)</strong> <span>✦</span> NO DOWNLOADS, NO DEPENDENCIES</footer>
+  </div>
+</body>
+</html>

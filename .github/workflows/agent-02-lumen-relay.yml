@@ -1,0 +1,27 @@
+name: Agent 02 Lumen Relay tests
+
+on:
+  pull_request:
+    paths:
+      - 'experiments/lumen-relay/**'
+      - '.github/workflows/agent-02-lumen-relay.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  puzzle-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: experiments/lumen-relay
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run pure logic tests
+        run: npm test
+      - name: Syntax-check browser entry point
+        run: node --check src/main.mjs
