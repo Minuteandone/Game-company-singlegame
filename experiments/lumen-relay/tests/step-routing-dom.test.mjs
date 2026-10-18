@@ -38,6 +38,7 @@ class Element {
   }
   setAttribute(key, value) { this.attributes.set(key, String(value)); }
   getAttribute(key) { return this.attributes.get(key) ?? null; }
+  focus() { globalThis.document.activeElement = this; }
   addEventListener(name, callback) {
     this.listeners.set(name, [...(this.listeners.get(name) ?? []), callback]);
   }
@@ -66,6 +67,7 @@ const documentEvents = new Map();
 globalThis.window = { location: { search: "?level=double-pass" } };
 globalThis.document = {
   title: "",
+  activeElement: null,
   getElementById(id) { return els[id] ?? null; },
   querySelectorAll(selector) { return selector === "[data-step-level]" ? links : []; },
   createElement(tag) { return new Element(tag); },
@@ -160,4 +162,80 @@ test("keyboard A advances one cell and R resets", () => {
     preventDefault() {} });
   assert.equal(els.steps.textContent, "0");
   assert.equal(els.advance.disabled, true);
+});
+
+
+test("focused Begin hands keyboard control to enabled Advance", () => {
+  els.reset.click();
+  els.begin.focus();
+  els.begin.click();
+  assert.equal(els.begin.disabled, true);
+  assert.equal(els.advance.disabled, false);
+  assert.strictEqual(document.activeElement, els.advance);
+});
+
+test("Reset from a focused Advance moves focus to usable Begin", () => {
+  els.advance.focus();
+  els.advance.click();
+  assert.equal(els.steps.textContent, "1");
+  els.reset.click();
+  assert.equal(els.advance.disabled, true);
+  assert.equal(els.begin.disabled, false);
+  assert.strictEqual(document.activeElement, els.begin);
+});
+
+test("R shortcut from a focused mirror survives board replacement", () => {
+  els.begin.click();
+  const focusedMirror = liveMirror();
+  focusedMirror.focus();
+  assert.strictEqual(document.activeElement, focusedMirror);
+  documentEvents.get("keydown")({
+    code: "KeyR", altKey: false, ctrlKey: false, metaKey: false, repeat: false,
+    preventDefault() {}
+  });
+  assert.equal(els.advance.disabled, true);
+  assert.equal(els.begin.disabled, false);
+  assert.strictEqual(document.activeElement, els.begin);
+});
+
+test("terminal Advance focus moves to newly available Begin new run", () => {
+  els.begin.focus();
+  els.begin.click();
+  els.advance.focus();
+  advanceUntilComplete();
+  assert.equal(els.advance.disabled, true);
+  assert.equal(els.begin.disabled, false);
+  assert.strictEqual(document.activeElement, els.begin);
+  assert.match(els.begin.textContent, /Begin new step run/);
+});
+
+test("A shortcut changes the pulse without stealing focus from Hint", () => {
+  els.begin.click();
+  els.hint.focus();
+  const stepBefore = Number(els.steps.textContent);
+  documentEvents.get("keydown")({
+    code: "KeyA", altKey: false, ctrlKey: false, metaKey: false, repeat: false,
+    preventDefault() {}
+  });
+  assert.strictEqual(document.activeElement, els.hint);
+  assert.equal(Number(els.steps.textContent), stepBefore + 1);
+});
+
+test("finishing via A shortcut on a focused live mirror returns focus to Begin", () => {
+  els.reset.click();
+  els.begin.click();
+  const mirrorButton = liveMirror();
+  mirrorButton.focus();
+  assert.strictEqual(document.activeElement, mirrorButton);
+  const keydown = documentEvents.get("keydown");
+  for (let attempts = 0; attempts < 65 && !els.advance.disabled; attempts++) {
+    keydown({
+      code: "KeyA", altKey: false, ctrlKey: false, metaKey: false, repeat: false,
+      preventDefault() {}
+    });
+  }
+  assert.equal(els.advance.disabled, true);
+  assert.equal(els.begin.disabled, false);
+  assert.strictEqual(document.activeElement, els.begin,
+    "a terminal pulse must not leave focus on a disabled mirror");
 });

@@ -67,11 +67,14 @@
       check(!doc.getElementById('advance').disabled, 'Begin did not enable step controls');
       for (let i = 0; i < beforeFlips; i++) doc.getElementById('advance').click();
       for (const coordinates of flips) rotate(doc, coordinates);
+      doc.getElementById('advance').focus();
       let advances = 0;
       while (doc.getElementById('status').dataset.state === 'ready' && advances++ < 60) {
         doc.getElementById('advance').click();
       }
       check(advances < 60, 'Step mode got stuck without terminal outcome');
+      check(doc.activeElement === doc.getElementById('begin'),
+        'Terminal step run did not move focus from disabled Advance to new run');
       return doc.getElementById('status').dataset.state;
     }
     function mobileBoardCheck(frame, mirrorKey) {
@@ -184,6 +187,30 @@
           'Step mode did not count both rotations');
         stepDoc.getElementById('reset').click();
         check(stepDoc.getElementById('steps').textContent === '0', 'Step-mode reset did not clear steps');
+
+        stepDoc.getElementById('begin').focus();
+        stepDoc.getElementById('begin').click();
+        check(stepDoc.activeElement === stepDoc.getElementById('advance'),
+          'Begin step mode did not move focus from disabled Begin to enabled Advance');
+        stepDoc.getElementById('advance').click();
+        stepDoc.getElementById('reset').click();
+        check(stepDoc.activeElement === stepDoc.getElementById('begin'),
+          'Reset from focused Advance did not return focus to Begin');
+        stepDoc.getElementById('begin').click();
+        const stepFocusMirror = cell(stepDoc, '2,4');
+        stepFocusMirror.focus();
+        stepDoc.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', bubbles: true }));
+        check(stepDoc.activeElement === stepDoc.getElementById('begin'),
+          'Keyboard Reset from a removed mirror did not restore focus to Begin');
+        stepDoc.getElementById('begin').click();
+        cell(stepDoc, '2,4').focus();
+        let shortcutSteps = 0;
+        while (!stepDoc.getElementById('advance').disabled && shortcutSteps++ < 60) {
+          stepDoc.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyA', bubbles: true }));
+        }
+        check(shortcutSteps < 60, 'Step keyboard shortcut run never terminated');
+        check(stepDoc.activeElement === stepDoc.getElementById('begin'),
+          'Terminal Step Mode left keyboard focus on a disabled live mirror');
 
         const doubleDoc = doubleStep.contentDocument;
         check(doubleDoc.getElementById('level-title').textContent === 'Double Pass',
