@@ -11,8 +11,8 @@ test("reflection geometry is correct in all four directions", () => {
 
 test("each shipped level starts unsolved and has a known solution", () => {
   const solutions = [
-    { "3,3": "/", "3,1": "/" },
-    { "3,5": "/", "3,1": "/", "6,1": "\\", "6,4": "\\" },
+    { "3,3": "/" },
+    { "3,5": "/", "3,1": "/", "6,1": "\\" },
     { "2,1": "\\", "2,5": "\\", "7,5": "/", "7,2": "/" }
   ];
   for (const [index, level] of LEVELS.entries()) {
@@ -66,4 +66,62 @@ test("repeated beam states are detected instead of looping forever", () => {
     ]
   };
   assert.equal(tracePulse(level).outcome, "loop");
+});
+
+test("teaching progression starts with exactly one change and preserves a correct mirror", () => {
+  const first = createMirrorState(LEVELS[0]);
+  assert.equal(LEVELS[0].mirrors.length, 1);
+  assert.equal(tracePulse(LEVELS[0], rotateMirror(first, 3, 3)).outcome, "won");
+  assert.equal(createMirrorState(LEVELS[1])["3,1"], "/");
+});
+
+test("straight-line receiver returns all traveled cells in order", () => {
+  const level = {
+    width: 4, height: 1, source: { x: 0, y: 0, dir: "E" },
+    goal: { x: 3, y: 0 }, mirrors: [], walls: []
+  };
+  const result = tracePulse(level);
+  assert.equal(result.outcome, "won");
+  assert.deepEqual(result.path.map(({ x, y }) => [x, y]), [[0, 0], [1, 0], [2, 0], [3, 0]]);
+});
+
+test("slash and backslash vector fixtures give distinct receiver outcomes", () => {
+  const base = {
+    width: 3, height: 3, source: { x: 1, y: 2, dir: "N" },
+    mirrors: [{ x: 1, y: 1, orientation: "/" }], walls: []
+  };
+  const slash = { ...base, goal: { x: 2, y: 1 } };
+  const backslash = { ...base, goal: { x: 0, y: 1 } };
+  assert.equal(tracePulse(slash).outcome, "won");
+  assert.deepEqual(tracePulse(slash).path.map(({ x, y }) => [x, y]), [[1, 2], [1, 1], [2, 1]]);
+  const backslashMirrors = rotateMirror(createMirrorState(base), 1, 1);
+  assert.equal(tracePulse(backslash, backslashMirrors).outcome, "won");
+  assert.deepEqual(tracePulse(backslash, backslashMirrors).path.map(({ x, y }) => [x, y]), [[1, 2], [1, 1], [0, 1]]);
+});
+
+test("changing a mirror changes only the trace downstream from that mirror", () => {
+  const level = {
+    width: 3, height: 3,
+    source: { x: 1, y: 2, dir: "N" },
+    goal: { x: 2, y: 1 },
+    walls: [], mirrors: [{ x: 1, y: 1, orientation: "/" }]
+  };
+  const before = tracePulse(level);
+  const after = tracePulse(level, rotateMirror(createMirrorState(level), 1, 1));
+  assert.equal(before.outcome, "won");
+  assert.equal(after.outcome, "escaped");
+  assert.deepEqual(before.path.slice(0, 2).map(p => [p.x, p.y]),
+    after.path.slice(0, 2).map(p => [p.x, p.y]));
+  assert.notDeepEqual(before.path.slice(2), after.path.slice(2));
+});
+
+test("goal-less boundary vector exits without fabricating an off-grid cell", () => {
+  const level = {
+    width: 3, height: 1,
+    source: { x: 0, y: 0, dir: "E" },
+    goal: null, mirrors: [], walls: []
+  };
+  const result = tracePulse(level);
+  assert.equal(result.outcome, "escaped");
+  assert.deepEqual(result.path.map(({ x, y }) => [x, y]), [[0, 0], [1, 0], [2, 0]]);
 });
