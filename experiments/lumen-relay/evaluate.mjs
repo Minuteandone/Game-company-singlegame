@@ -1,4 +1,5 @@
 import { CANDIDATES, getCandidateFromSearch } from "./evaluate-candidates.mjs";
+import { summarizeEvidence, evidenceSummaryText } from "./evidence-summary.mjs";
 const STORAGE_KEY = "lumen-relay-playtest-records-v1";
 
 const FIELD_IDS = [
@@ -15,6 +16,8 @@ Object.assign(elements, {
   copyCurrent: byId("copy-current"),
   resetForm: byId("reset-form"),
   clearSaved: byId("clear-saved"),
+  copySummary: byId("copy-summary"),
+  evidenceSummary: byId("evidence-summary"),
   savedList: byId("saved-list"),
   status: byId("status"),
   manualCopyPanel: byId("manual-copy-panel"),
@@ -174,8 +177,29 @@ function resetForm() {
   setStatus("Observation fields cleared.");
 }
 
+function renderEvidenceSummary(records) {
+  const summary = summarizeEvidence(records);
+  elements.copySummary.disabled = summary.totalSessions === 0;
+  if (summary.totalSessions === 0) {
+    elements.evidenceSummary.textContent =
+      "No saved evidence yet. Summary counts will appear after local sessions are recorded.";
+    return;
+  }
+
+  const directions = summary.evidenceDirections;
+  elements.evidenceSummary.textContent =
+    summary.totalSessions + " saved session" + (summary.totalSessions === 1 ? "" : "s") +
+    ". Matched Double Pass: " + summary.matchedDoublePass.timedSessions +
+    " timed / " + summary.matchedDoublePass.stepSessions +
+    " step. Evidence directions — inconclusive: " + (directions.inconclusive ?? 0) +
+    ", Continue baseline: " + (directions["continue baseline"] ?? 0) +
+    ", Mutate with live routing: " + (directions["mutate with live routing"] ?? 0) +
+    ", Replace: " + (directions.replace ?? 0) + ".";
+}
+
 function renderRecords() {
   const records = loadRecords();
+  renderEvidenceSummary(records);
   elements.savedList.replaceChildren();
 
   if (!records.length) {
@@ -248,6 +272,18 @@ elements.saveSession.addEventListener("click", () => {
 elements.copyCurrent.addEventListener("click", async () => {
   const ok = await copyText(reportFor(currentRecord()));
   setStatus(ok ? "Current Issue #8 report copied." : "Automatic copy was blocked; select and copy the complete report shown below.");
+});
+
+elements.copySummary.addEventListener("click", async () => {
+  const records = loadRecords();
+  if (!records.length) {
+    setStatus("No locally saved sessions to summarize yet.");
+    return;
+  }
+  const ok = await copyText(evidenceSummaryText(summarizeEvidence(records)));
+  setStatus(ok
+    ? "Local evidence summary copied. It reports coverage and counts only."
+    : "Automatic copy was blocked; select and copy the evidence summary shown below.");
 });
 
 elements.selectManualCopy.addEventListener("click", () => {
