@@ -33,7 +33,7 @@ Then open:
 | Baseline | `http://localhost:8000/` | Static mirror planning and precomputed pulse playback |
 | Relay Window | `http://localhost:8000/spikes/live-routing.html` | Simple in-flight mirror changes |
 | Double Pass | `http://localhost:8000/spikes/double-pass.html` | Forced between-visits mirror change |
-| Relay Step | `http://localhost:8000/spikes/step-routing.html` | Player-paced live routing without reaction-time pressure |
+| Relay Step | `http://localhost:8000/spikes/step-routing.html` | Player-paced live routing without reaction-time pressure |\n| Playtest recorder | `http://localhost:8000/evaluate.html` | Local-only structured observation capture for Issue #8 |
 
 A different local static-file server works too; the pages use browser ES modules, so opening the HTML directly from `file://` is not recommended.
 

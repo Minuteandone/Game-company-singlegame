@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101e28">
+  <meta name="description" content="Local observation recorder for Lumen Relay playtests.">
+  <title>Lumen Relay — Playtest Recorder</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .recorder-shell{width:min(920px,calc(100% - 28px));margin:0 auto;padding:36px 0 50px}
+    .recorder-head{max-width:760px;margin-bottom:24px}
+    .recorder-head h1{margin:.15em 0;font-size:clamp(38px,7vw,68px);letter-spacing:-.045em}
+    .recorder-head p{color:#b8c9cb;line-height:1.65}
+    .privacy-note{border-left:3px solid #7de7dc;background:#132735;padding:12px 14px;border-radius:0 9px 9px 0}
+    .recorder-card{border:1px solid #30495a;border-radius:18px;background:#10202d;padding:clamp(16px,3vw,28px);margin-top:18px}
+    .recorder-card h2{margin-top:0}
+    .grid-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .field{display:grid;gap:6px}
+    .field label,.field legend{font-weight:800;font-size:13px}
+    .field select,.field textarea{width:100%;border:1px solid #506979;border-radius:9px;background:#0c1822;color:#edf8fb;padding:10px 11px;font:inherit}
+    .field textarea{min-height:92px;resize:vertical;line-height:1.5}
+    .metric-grid{display:grid;gap:14px;margin-top:18px}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .actions button,.actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border-radius:9px;padding:9px 15px;font-weight:800;text-decoration:none;cursor:pointer}
+    .primary-action{border:0;background:#79e8e0;color:#08211e}
+    .secondary-action{border:1px solid #566f7f;background:#1b3040;color:#edf8fb}
+    .danger-action{border:1px solid #8c615b;background:#332421;color:#ffd2c9}
+    .status{min-height:24px;color:#ffd58a;margin:14px 0 0}
+    .saved-list{display:grid;gap:10px;margin-top:14px}
+    .saved-item{border:1px solid #30495a;border-radius:12px;padding:12px;background:#0c1923}
+    .saved-head{display:flex;justify-content:space-between;gap:14px;align-items:start}
+    .saved-head strong{display:block}
+    .saved-meta{color:#91a8b3;font-size:12px;margin-top:3px}
+    .saved-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+    .saved-actions button{border:1px solid #506979;border-radius:7px;background:#172b39;color:#edf8fb;padding:7px 10px;cursor:pointer}
+    .empty{color:#91a8b3;font-style:italic}
+    .small{font-size:12px;color:#91a8b3}
+    @media(max-width:650px){.grid-two{grid-template-columns:1fr}.actions button,.actions a{flex:1 1 100%}.saved-head{display:block}}
+  </style>
+  <script type="module" src="./evaluate.mjs"></script>
+</head>
+<body>
+  <main class="recorder-shell">
+    <header class="recorder-head">
+      <p class="eyebrow">LUMEN RELAY · EVIDENCE GATE</p>
+      <h1>Playtest recorder</h1>
+      <p>Run a candidate, watch what actually happens, and capture observations in the same structure used by the live-routing evaluation protocol. This page records evidence; it does not score the game or choose a winner for you.</p>
+      <p class="privacy-note"><strong>Local only:</strong> saved sessions stay in this browser's local storage. This page sends no analytics or playtest data anywhere. Use <em>Copy Issue #8 report</em> when you deliberately want to share a record.</p>
+    </header>
+
+    <section class="recorder-card" aria-labelledby="session-title">
+      <h2 id="session-title">New observation session</h2>
+      <div class="grid-two">
+        <div class="field">
+          <label for="candidate">Candidate</label>
+          <select id="candidate">
+            <option value="baseline">Baseline</option>
+            <option value="relay-window">Relay Window</option>
+            <option value="double-pass">Double Pass</option>
+            <option value="relay-step">Relay Step</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="device">Device class</label>
+          <select id="device">
+            <option value="desktop/laptop">Desktop / laptop</option>
+            <option value="phone">Phone</option>
+            <option value="tablet">Tablet</option>
+            <option value="other">Other / unknown</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="input">Primary input</label>
+          <select id="input">
+            <option value="mouse/trackpad">Mouse / trackpad</option>
+            <option value="keyboard">Keyboard only</option>
+            <option value="touch">Touch</option>
+            <option value="mixed">Mixed</option>
+            <option value="assistive-tech">Assistive technology / other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="viewport">Viewport</label>
+          <select id="viewport">
+            <option value="wide">Wide</option>
+            <option value="narrow">Narrow / phone-sized</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="motion">Reduced-motion preference</label>
+          <select id="motion">
+            <option value="not enabled">Not enabled</option>
+            <option value="enabled">Enabled</option>
+            <option value="not tested">Not tested / unknown</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="result">Session result</label>
+          <select id="result">
+            <option value="completed">Completed / solved</option>
+            <option value="attempted">Attempted, not completed</option>
+            <option value="observed only">Observed only</option>
+            <option value="not recorded">Not recorded</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="open-candidate" class="primary-action" type="button">Open selected candidate ↗</button>
+        <a class="secondary-action" href="./spikes/README.md">Experiment notes</a>
+        <a class="secondary-action" href="../../docs/live-routing-evaluation.md">Evaluation protocol</a>
+      </div>
+
+      <div class="metric-grid">
+        <div class="field">
+          <label for="discoverability">Discoverability — what did the tester find or miss without prompting?</label>
+          <textarea id="discoverability" placeholder="Observation, not a score. Mark 'not tested' when unknown."></textarea>
+        </div>
+        <div class="field">
+          <label for="causal">Causal understanding — after a result, could they explain why the pulse took that route?</label>
+          <textarea id="causal"></textarea>
+        </div>
+        <div class="field">
+          <label for="movement">Meaningful movement — did waiting/stepping change the decision, or only delay feedback?</label>
+          <textarea id="movement"></textarea>
+        </div>
+        <div class="field">
+          <label for="fairness">Fairness — did failures feel attributable to decisions, presentation, or input latency?</label>
+          <textarea id="fairness"></textarea>
+        </div>
+        <div class="field">
+          <label for="accessibility">Accessibility/control — keyboard, touch, orientation labels, reduced motion, or no-reaction-time observations</label>
+          <textarea id="accessibility"></textarea>
+        </div>
+        <div class="field">
+          <label for="replay">Replay interest — would the tester willingly try a harder level with this mechanic?</label>
+          <textarea id="replay"></textarea>
+        </div>
+        <div class="field">
+          <label for="notes">Other observations</label>
+          <textarea id="notes"></textarea>
+        </div>
+        <div class="field">
+          <label for="verdict">Evidence direction for this session</label>
+          <select id="verdict">
+            <option value="inconclusive">Inconclusive / no verdict</option>
+            <option value="continue baseline">Leans Continue baseline</option>
+            <option value="mutate with live routing">Leans Mutate with live routing</option>
+            <option value="replace">Leans Replace</option>
+          </select>
+          <span class="small">One session does not automatically become the company verdict.</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="save-session" class="primary-action" type="button">Save local session</button>
+        <button id="copy-current" class="secondary-action" type="button">Copy current Issue #8 report</button>
+        <button id="reset-form" class="secondary-action" type="button">Clear form</button>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="recorder-card" aria-labelledby="saved-title">
+      <div class="saved-head">
+        <div>
+          <h2 id="saved-title">Saved local sessions</h2>
+          <p class="small">Records remain only in this browser until you copy or delete them.</p>
+        </div>
+        <button id="clear-saved" class="danger-action" type="button">Delete all saved sessions</button>
+      </div>
+      <div id="saved-list" class="saved-list"></div>
+    </section>
+  </main>
+</body>
+</html>
