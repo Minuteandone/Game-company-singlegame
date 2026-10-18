@@ -1,12 +1,13 @@
 import { LEVELS } from "./levels.mjs";
-import { createMirrorState, positionKey, rotateMirror, tracePulse } from "./engine.mjs";
+import { createMirrorState, positionKey, tracePulse } from "./engine.mjs";
+import { applyTurn, undoTurn } from "./turn-history.mjs";
 
 const byId = id => document.getElementById(id);
 const elements = {
   board: byId("board"), chapter: byId("chapter"),
   title: byId("level-title"), subtitle: byId("level-subtitle"),
   shots: byId("shots"), turns: byId("turns"), fire: byId("fire"),
-  reset: byId("reset"), hint: byId("hint"), next: byId("next"),
+  reset: byId("reset"), undo: byId("undo"), hint: byId("hint"), next: byId("next"),
   status: byId("status"), sound: byId("sound")
 };
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -14,6 +15,7 @@ const AudioContextClass = window.AudioContext || window.webkitAudioContext;
 const state = {
   levelIndex: 0, mirrors: {}, shots: 0, turns: 0,
   playing: false, won: false, soundOn: false,
+  history: [],
   audioContext: null, generation: 0
 };
 let tiles = new Map();
@@ -29,6 +31,7 @@ function displayCounters() {
 }
 function syncControls() {
   elements.fire.disabled = state.playing || state.won;
+  elements.undo.disabled = state.playing || state.won || state.history.length === 0;
   elements.fire.textContent = state.playing ? "Pulse travelling…" : "➜ Send pulse";
   elements.next.hidden = !state.won;
   elements.next.textContent = state.levelIndex === LEVELS.length - 1
@@ -75,12 +78,16 @@ function renderBoard() {
         tile.setAttribute("aria-label", mirrorLabel(x, y, state.mirrors[key]));
         tile.addEventListener("click", () => {
           if (state.playing || state.won) return;
-          state.mirrors = rotateMirror(state.mirrors, x, y);
-          state.turns += 1;
+          const turn = applyTurn(state.mirrors, state.history, x, y);
+          if (!turn.turned) return;
+          state.mirrors = turn.mirrors;
+          state.history = turn.history;
+          state.turns = state.history.length;
           tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
           tile.setAttribute("aria-label", mirrorLabel(x, y, state.mirrors[key]));
           clearGlow();
           displayCounters();
+          syncControls();
           setStatus(cellLabel(x, y, "Mirror turned to " + mirrorOrientation(state.mirrors[key])) + ". Send a pulse to test the route.");
           chirp(500);
         });
@@ -142,12 +149,33 @@ function resetLevel() {
   state.mirrors = createMirrorState(currentLevel());
   state.shots = 0;
   state.turns = 0;
+  state.history = [];
   state.playing = false;
   state.won = false;
   renderBoard();
   displayCounters();
   syncControls();
   setStatus("Click a mirror to rotate it, then send a pulse.");
+}
+function undoLastTurn() {
+  if (state.playing || state.won || state.history.length === 0) return;
+  const result = undoTurn(state.mirrors, state.history);
+  const { x, y } = result.undone;
+  state.mirrors = result.mirrors;
+  state.history = result.history;
+  state.turns = state.history.length;
+  const key = positionKey(x, y);
+  const tile = tiles.get(key);
+  if (tile) {
+    tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
+    tile.setAttribute("aria-label", mirrorLabel(x, y, state.mirrors[key]));
+  }
+  clearGlow();
+  displayCounters();
+  syncControls();
+  setStatus(cellLabel(x, y, "Last turn undone; mirror restored to " +
+    mirrorOrientation(state.mirrors[key])) + ". Send a pulse when ready.");
+  chirp(390);
 }
 function loadLevel(index) {
   state.levelIndex = index;
@@ -205,6 +233,7 @@ async function sendPulse() {
 }
 elements.fire.addEventListener("click", sendPulse);
 elements.reset.addEventListener("click", resetLevel);
+elements.undo.addEventListener("click", undoLastTurn);
 elements.next.addEventListener("click", () => {
   loadLevel(state.levelIndex === LEVELS.length - 1 ? 0 : state.levelIndex + 1);
 });
@@ -218,6 +247,7 @@ elements.sound.addEventListener("click", () => {
 document.addEventListener("keydown", event => {
   if (event.altKey || event.ctrlKey || event.metaKey) return;
   if (event.key.toLowerCase() === "r") resetLevel();
+  if (event.key.toLowerCase() === "u" && !event.repeat) undoLastTurn();
   if (event.key.toLowerCase() === "p") void sendPulse();
 });
 loadLevel(0);
