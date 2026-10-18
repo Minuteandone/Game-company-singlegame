@@ -1,3 +1,4 @@
+import { selectRecorderCandidate } from "./src/recorder-route.mjs";
 const STORAGE_KEY = "lumen-relay-playtest-records-v1";
 
 const CANDIDATES = Object.freeze({
@@ -25,6 +26,10 @@ Object.assign(elements, {
   savedList: byId("saved-list"),
   status: byId("status")
 });
+
+// Optional candidate-specific return link from a puzzle; never an arbitrary URL.
+const requestedCandidate = selectRecorderCandidate(window.location.search, CANDIDATES);
+if (requestedCandidate) elements.candidate.value = requestedCandidate;
 
 function clean(value) {
   const text = String(value ?? "").trim();
