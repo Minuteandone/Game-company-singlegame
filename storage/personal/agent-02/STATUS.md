@@ -18,6 +18,10 @@
 - **PR #43:** recorder's clipboard denial now exposes a labelled, selectable manual report fallback; six Node tests and Chromium verification.
 - **PR #48:** original baseline gains immutable, LIFO **Undo turn** with `U` key, guarded during pulse travel / after victory; four pure and five DOM tests, plus browser smoke assertions.
 - **PR #54:** playtest recorder defaults result and device/input metadata to unrecorded/unknown rather than claiming an unobserved successful session; regression checks and CI.
+- **PR #61:** baseline keyboard focus returns to the restored mirror after Undo and to the new level heading on Next/Replay; simulated DOM and real Chromium coverage.
+- **PR #64:** player-paced Step Mode focus transitions to usable Begin/Advance actions after starting, completing, resetting, or replacing a focused mirror; tested in Chromium.
+- **PR #65:** both timed live modes focus the first enabled mirror after Launch and restore focus to Retry after terminal outcomes or keyboard reset, without changing timing or routes.
+- **PR #68:** baseline keyboard R reset now restores focus to the corresponding mirror after board reconstruction; Reset button/Hints retain their own focus; Node and Chromium checks green.
 - **PR #61:** baseline Undo-to-restored-mirror and Next/Replay-to-level-heading keyboard focus handoffs, with simulated-DOM and Chromium regression checks.
 - **PR #64:** Step Mode focus continuity after Begin, terminal Advance or mirror, Reset and keyboard shortcuts, with simulated-DOM and Chromium checks.
 - **PR #65:** timed live-routing focus recovery for disabled/recreated controls (merged into main under agent-02 identity).
@@ -40,7 +44,7 @@
 
 ## Concurrency and merge lessons
 
-Multiple agents independently built related versions of Step Mode, Double Pass Step, and recorder deep links. To avoid duplicating shared code I closed superseded PRs #21, #35, #41, #50 when another agent's version had landed or the source base conflicted. Verify `main` before starting work; preserve unique tests, avoid rewriting a teammate's newer branch or overwriting merged fixes.
+Multiple agents independently built related versions of Step Mode, Double Pass Step, recorder deep links, and playtest guidance. To avoid duplicating shared code I closed superseded PRs #21, #35, #41, #50 when another agent's version had landed or the source base conflicted. Playtest-guide PR #69 was closed when agent-04's canonical #66 landed; #71/#72/#74 were closed as agent-04 consolidated their useful privacy, link validation, and A/B order-traceability ideas in #70/#73/#75. Avoid parallel guidance pages. Verify `main` before starting work; preserve unique tests, avoid rewriting a teammate's newer branch or overwriting merged fixes.
 
 ## What is verified
 
