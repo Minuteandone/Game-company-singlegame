@@ -25,10 +25,11 @@ Then choose a variant:
 - `http://localhost:8000/spikes/live-routing.html` — **Relay Window**. Two independent live mirrors and generous deadlines. Useful as the simplest proof that between-step changes alter a moving pulse; intentionally vulnerable to flipping both mirrors immediately.
 - `http://localhost:8000/spikes/double-pass.html` — **Double Pass**, by agent-04. The same live mirror is visited twice and needs opposite orientations. A successful run therefore requires a genuine change between visits.
 - `http://localhost:8000/spikes/step-routing.html` — **Relay Step**. Player-paced control using the same live engine: the pulse advances only when the player chooses Advance one cell, removing the reaction-time requirement.
+- `http://localhost:8000/spikes/double-pass-step.html` — **Double Pass Step**, by agent-02. Identical loop geometry and mirror rules to real-time Double Pass, but manual movement. This isolates the effect of reaction-time pressure without changing the puzzle.
 
 The ordinary `index.html` remains the merged turn-based/precomputed-trace baseline.
 
-## Why three variants?
+## Why four variants?
 
 They separate different questions instead of mixing them together.
 
@@ -46,9 +47,9 @@ Questions:
 - Is one meaningful timed action satisfying, or merely stressful?
 - Does the moving pulse now justify becoming a gameplay mechanic rather than feedback?
 
-### Relay Step — accessibility control
+### Relay Step and Double Pass Step — accessibility controls
 
-Uses deterministic manual advancement instead of a timer. The player may inspect the board and rotate mirrors between cell advances.
+Both use deterministic manual advancement instead of a timer. Relay Step uses the simpler Relay Window fixture; Double Pass Step uses the exact same two-visit puzzle as the timed Double Pass page, allowing a controlled comparison of pacing rather than geometry.
 
 Questions:
 - Does the logical routing challenge survive when reaction speed is removed?
@@ -60,8 +61,9 @@ Questions:
 - `live-engine.mjs` — pure one-cell transition; reuses baseline reflection geometry.
 - `live-level.mjs` — Relay Window fixture.
 - `double-pass-level.mjs` — agent-04's same-mirror/two-visit fixture.
-- `live-routing.mjs`, `double-pass.mjs`, `step-routing.mjs` — independent browser control surfaces.
+- `live-routing.mjs`, `double-pass.mjs`, `step-routing.mjs`, `double-pass-step.mjs` — independent browser control surfaces.
 - `../tests/live-routing.test.mjs` and `../tests/double-pass-live-routing.test.mjs` — route/timing semantics.
-- `../tests/live-routing-ui.test.mjs` — syntax-checks every browser module.
+- `../tests/live-routing-ui.test.mjs` — syntax-checks browser modules.
+- `../tests/double-pass-step-ui.test.mjs` — simulated-DOM smoke tests for the actual Double Pass Step browser entry, win/failure/reset/keyboard controls.
 
 The experiments should be judged with `docs/live-routing-evaluation.md`. Automated tests establish correctness, not fun or usability. A Continue / Mutate / Replace decision still requires actual browser/device observations.
