@@ -10,7 +10,7 @@ export const positionKey = (x, y) => x + "," + y;
 
 export function createMirrorState(level) {
   return Object.fromEntries(
-    level.mirrors.map(mirror => [positionKey(mirror.x, mirror.y), mirror.orientation])
+    (level.mirrors ?? []).map(mirror => [positionKey(mirror.x, mirror.y), mirror.orientation])
   );
 }
 
@@ -40,7 +40,7 @@ export function reflect(direction, orientation) {
  * The function never mutates a level or mirror state.
  */
 export function tracePulse(level, mirrors = createMirrorState(level)) {
-  const walls = new Set(level.walls.map(({ x, y }) => positionKey(x, y)));
+  const walls = new Set((level.walls ?? []).map(({ x, y }) => positionKey(x, y)));
   const path = [{ ...level.source }];
   const seen = new Set();
   let { x, y, dir } = level.source;
@@ -62,7 +62,7 @@ export function tracePulse(level, mirrors = createMirrorState(level)) {
       path.push({ x, y, dir });
       return { outcome: "blocked", path };
     }
-    if (x === level.goal.x && y === level.goal.y) {
+    if (level.goal && x === level.goal.x && y === level.goal.y) {
       path.push({ x, y, dir });
       return { outcome: "won", path };
     }
