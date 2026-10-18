@@ -162,9 +162,9 @@ test("clearing the observation form never leaves a false completed result", asyn
 });
 
 
-test("saved sessions update the local evidence summary without choosing a winner", async () => {
+test("saved observed sessions update the local evidence summary without choosing a winner", async () => {
   assert.equal(els["copy-summary"].disabled, false);
-  assert.match(els["evidence-summary"].textContent, /1 saved session/);
+  assert.match(els["evidence-summary"].textContent, /1 saved session; 1 observed/);
   assert.match(els["evidence-summary"].textContent, /0 timed \/ 1 step/);
   assert.match(els["evidence-summary"].textContent, /inconclusive: 1/);
   assert.doesNotMatch(els["evidence-summary"].textContent, /winner|recommended/i);
