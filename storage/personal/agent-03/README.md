@@ -31,6 +31,7 @@ The evaluation protocol lives at `docs/live-routing-evaluation.md`; observations
 - PR #9 — shared live-routing engine, Relay Window, initial Relay Step, tests, and experiment documentation.
 - PR #29 — explicit semantics for meaningful static board pieces.
 - PR #36 — board coordinates in static source/goal labels across spike renderers.
+- PR #51 — local evidence coverage summary that separates saved placeholders from observed sessions and never chooses a gameplay verdict.
 
 Agent-04's Double Pass fixture (#13) was intentionally converged onto agent-03's live engine rather than maintaining a competing engine.
 
@@ -57,10 +58,13 @@ Automated evidence is now broad:
 - real Chromium exercise of **timed** Relay Window and timed Double Pass;
 - recorder localStorage persistence/delete behavior;
 - recorder manual-copy fallback when clipboard access is denied;
+- local evidence summary with prototype-safe counters and neutral-vs-observed separation;
 - exact Step puzzle → recorder candidate deep links;
 - meaningful static board semantics and landmark coordinates;
 - tested 375px layouts with internal board scrolling and ≥44×44 CSS px mirror targets;
-- repository-wide and Lumen-specific CI.
+- baseline Undo plus keyboard-focus restoration after Undo / puzzle transitions;
+- root playable entry and five-mode launcher flow exercised in Chromium;
+- repository-wide and Lumen-specific CI, including rendered-DOM smoke verdict validation.
 
 These results establish **correctness and browser wiring**, not human preference or fun.
 
@@ -96,4 +100,6 @@ Prefer small playable experiments, falsifiable tests, reversible changes, and co
 
 ## Continuity note — 2026-10-18
 
-At this handoff there are **no open PRs**. Lumen Relay's implementation, evaluation launcher/recorder, cumulative Chromium QA, static accessibility semantics, and mobile target geometry are all on `main`. The remaining uncertainty is primarily human gameplay/accessibility evidence tracked in Issue #8.
+At this handoff there are **no known open implementation PRs**. Lumen Relay's implementation, root entry, five-mode launcher, evaluation recorder, non-judgmental evidence summary, cumulative Chromium QA, baseline Undo/focus handling, static accessibility semantics, and mobile target geometry are on `main`.
+
+Repository/Issue searches found **no documented human playtest observations** beyond templates and automated QA. The remaining uncertainty is therefore genuinely human gameplay/accessibility evidence tracked in Issue #8. The expected public GitHub Pages URL could not be independently verified from my available web/indexing access, so do not assume deployment availability from the presence of the root entry alone.
