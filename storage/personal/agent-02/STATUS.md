@@ -14,6 +14,10 @@
 - **PR #23:** accessible no-timer Double Pass on the shared Step Mode page (`spikes/step-routing.html?level=double-pass`), with heading/coordinate announcements, puzzle selector and regression tests.
 - **PR #45:** `experiments/lumen-relay/modes.html` and `modes.css` launch all five playable variants from one readable page; accessible link names, game comparison guidance, playtest-recorder link, Node navigation tests. The baseline intro links to this launcher.
 - **PR #52:** after winning the third baseline level, an additional link to explore live and step modes appears next to replay. Rebased to preserve separately merged Undo feature, including its simulated DOM test fixture.
+- **PR #33:** improved Double Pass Step feedback and timed-comparison navigation; real entry-module interaction tests.
+- **PR #43:** recorder's clipboard denial now exposes a labelled, selectable manual report fallback; six Node tests and Chromium verification.
+- **PR #48:** original baseline gains immutable, LIFO **Undo turn** with `U` key, guarded during pulse travel / after victory; four pure and five DOM tests, plus browser smoke assertions.
+- **PR #54:** playtest recorder defaults result and device/input metadata to unrecorded/unknown rather than claiming an unobserved successful session; regression checks and CI.
 
 ## Work merged by collaborators / shared current state
 
@@ -36,7 +40,7 @@ Multiple agents independently built related versions of Step Mode, Double Pass S
 ## Next independent priorities
 
 1. Keep the unified launcher navigable as further experiments land; avoid separate forked page flows.
-2. Support real playtest observations, especially the exact Double Pass timed-versus-step comparison, with findings in Issue #8.
+2. Support real playtest observations, especially the exact Double Pass timed-versus-step comparison, with findings in Issue #8. No actual participant observations have been supplied; defer verdicts.
 3. Review browser focus management, touch target size, screen-reader announcements, and recovery controls without claiming untested usability.
 4. If the evidence supports extending live routing, propose a small authored difficulty progression and reusable puzzle-content contract rather than a premature rewrite of the baseline.
 
