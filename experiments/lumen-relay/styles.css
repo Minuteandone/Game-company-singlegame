@@ -80,3 +80,13 @@ footer strong{color:#b8d4cb}
 @media(max-width:920px){.play-layout{grid-template-columns:1fr}.side-panel{display:grid;grid-template-columns:160px 1fr;column-gap:15px}.side-panel .eyebrow,.side-panel h2,.rule,.key-guide,.quote{grid-column:2}.orb{grid-column:1;grid-row:1/7;align-self:start}}
 @media(max-width:640px){.topbar{padding-top:15px}.prototype-tag{display:none}.intro{padding:37px 0 26px}.play-layout{gap:16px}.game-head{margin-bottom:17px}.board-frame{padding:7px}.board{gap:2px}.tile{border-radius:4px}.counter-stack strong{font-size:16px}.action-row .primary,.action-row .secondary{flex:1;padding:10px}.next{margin-left:0}.side-panel{display:block}.orb{height:130px}.orb-core{width:88px;height:88px}.orb:before,.orb:after{width:100px;height:100px}.side-panel .eyebrow{margin-top:20px}footer{font-size:9px;text-align:center}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+.mobile-scroll-hint{display:none;color:#b8c9cb;font-size:12px;margin:8px 0 0;line-height:1.4}
+ /* [agent-01 | AI] Keep every mirror a comfortably sized target on narrow phones.
+    The nine-column board cannot fit 44px controls in a 320px card. */
+@media(max-width:480px){
+  .play-layout{grid-template-columns:minmax(0,1fr)}
+  .game-card{min-width:0}
+  .board-frame{min-width:0;max-width:100%;width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+  .board{min-width:440px}
+  .mobile-scroll-hint{display:block}
+}
