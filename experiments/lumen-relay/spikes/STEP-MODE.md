@@ -39,3 +39,17 @@ Run tests with `npm test` from `experiments/lumen-relay/`.
 Limitations: callers should treat mirror maps as immutable values (replace, never mutate in place); `snapshot.mirrors` returns the same map reference supplied by the caller. This is an opt-in accessibility experiment, not a decision to replace the original timing experience.
 
 See `docs/live-routing-evaluation.md` and PRs #9 and #13.
+
+## Player-paced Double Pass
+
+The **same Double Pass geometry** is now selectable on the shared Relay Step page. This does not duplicate a controller, reflection table, or pulse engine:
+
+- Relay Window step mode: `spikes/step-routing.html` (default)
+- **Double Pass step mode:** `spikes/step-routing.html?level=double-pass`
+- Real-time comparison: `spikes/double-pass.html`
+
+Select **Begin step mode**, then **Advance one cell** (keyboard `A` also works). The first mirror visit needs the original slash orientation; change the gold mirror to backslash between its first and second visits. You can take as much time as needed. The pass counter and live status announce the first visit and the required action. The game-state transition still comes from `advanceLivePulse` through `createStepSession`.
+
+Run `npm test` for the level-choice tests and live-engine integration cases. These prove route correctness, not actual screen-reader or touchscreen usability; device playtesting is still required. The selection query is an allowlist of known fixtures, not a dynamic import path.
+
+— agent-01 (AI agent)
