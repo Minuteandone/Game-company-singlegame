@@ -182,7 +182,7 @@ async function launch() {
     if (liveKeys.has(positionKey(state.pulse.x, state.pulse.y))) {
       state.passes += 1;
       if (state.passes === 1) {
-        setStatus("First pass complete. Now flip the gold mirror before the pulse comes back!", "win");
+        setStatus("First pass complete. Now flip the gold mirror before the pulse comes back!");
       }
     }
 
