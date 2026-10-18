@@ -7,9 +7,32 @@ const EVIDENCE_DIRECTIONS = [
   "replace"
 ];
 
+const OBSERVED_RESULTS = new Set(["completed", "attempted", "observed only"]);
+const UNREPORTED_VALUES = new Set([
+  "",
+  "unknown",
+  "not recorded",
+  "not tested",
+  "not tested / unknown",
+  "not tested / not recorded"
+]);
+
+function counter() {
+  return Object.create(null);
+}
+
 function increment(map, key) {
   const label = String(key ?? "unknown");
-  map[label] = (map[label] ?? 0) + 1;
+  map[label] = (Object.hasOwn(map, label) ? map[label] : 0) + 1;
+}
+
+function coverageLabel(value) {
+  const label = String(value ?? "").trim();
+  return UNREPORTED_VALUES.has(label.toLowerCase()) ? "unreported" : label;
+}
+
+function isObserved(record) {
+  return OBSERVED_RESULTS.has(record?.result);
 }
 
 function countLine(map, emptyLabel = "none") {
@@ -23,30 +46,38 @@ function countLine(map, emptyLabel = "none") {
 
 export function summarizeEvidence(records = [], candidates = CANDIDATES) {
   const safeRecords = Array.isArray(records) ? records : [];
-  const byCandidate = Object.fromEntries(
-    Object.entries(candidates).map(([id, candidate]) => [
-      id,
-      {
-        id,
-        label: candidate.label,
-        sessions: 0,
-        completed: 0,
-        evidenceDirections: Object.fromEntries(EVIDENCE_DIRECTIONS.map(direction => [direction, 0]))
-      }
-    ])
-  );
+  const byCandidate = Object.create(null);
 
-  const evidenceDirections = Object.fromEntries(EVIDENCE_DIRECTIONS.map(direction => [direction, 0]));
-  const devices = {};
-  const inputs = {};
-  const results = {};
+  for (const [id, candidate] of Object.entries(candidates)) {
+    byCandidate[id] = {
+      id,
+      label: candidate.label,
+      sessions: 0,
+      observedSessions: 0,
+      completed: 0,
+      evidenceDirections: Object.fromEntries(
+        EVIDENCE_DIRECTIONS.map(direction => [direction, 0])
+      )
+    };
+  }
+
+  const evidenceDirections = counter();
+  for (const direction of EVIDENCE_DIRECTIONS) evidenceDirections[direction] = 0;
+  const devices = counter();
+  const inputs = counter();
+  const results = counter();
   let unknownCandidates = 0;
 
   for (const record of safeRecords) {
-    const candidate = byCandidate[record?.candidate];
+    const id = record?.candidate;
+    const candidate = Object.hasOwn(byCandidate, id) ? byCandidate[id] : null;
+    const observed = isObserved(record);
+
     if (candidate) {
       candidate.sessions += 1;
+      if (observed) candidate.observedSessions += 1;
       if (record?.result === "completed") candidate.completed += 1;
+
       const direction = record?.evidenceDirection;
       if (Object.hasOwn(candidate.evidenceDirections, direction)) {
         candidate.evidenceDirections[direction] += 1;
@@ -63,12 +94,14 @@ export function summarizeEvidence(records = [], candidates = CANDIDATES) {
     }
 
     increment(results, record?.result || "unknown");
-    increment(devices, record?.environment?.device || "unknown");
-    increment(inputs, record?.environment?.input || "unknown");
+    increment(devices, coverageLabel(record?.environment?.device));
+    increment(inputs, coverageLabel(record?.environment?.input));
   }
 
-  const timedDoublePass = byCandidate["double-pass"]?.sessions ?? 0;
-  const stepDoublePass = byCandidate["double-pass-step"]?.sessions ?? 0;
+  const timedCandidate = byCandidate["double-pass"];
+  const stepCandidate = byCandidate["double-pass-step"];
+  const timedObserved = timedCandidate?.observedSessions ?? 0;
+  const stepObserved = stepCandidate?.observedSessions ?? 0;
 
   return {
     totalSessions: safeRecords.length,
@@ -79,9 +112,11 @@ export function summarizeEvidence(records = [], candidates = CANDIDATES) {
     inputs,
     unknownCandidates,
     matchedDoublePass: {
-      timedSessions: timedDoublePass,
-      stepSessions: stepDoublePass,
-      bothCovered: timedDoublePass > 0 && stepDoublePass > 0
+      timedSessions: timedObserved,
+      stepSessions: stepObserved,
+      timedSavedRecords: timedCandidate?.sessions ?? 0,
+      stepSavedRecords: stepCandidate?.sessions ?? 0,
+      bothCovered: timedObserved > 0 && stepObserved > 0
     }
   };
 }
@@ -90,15 +125,16 @@ export function evidenceSummaryText(summary) {
   const candidateLines = Object.values(summary.byCandidate)
     .map(candidate =>
       "- " + candidate.label + ": " + candidate.sessions +
-      " session" + (candidate.sessions === 1 ? "" : "s") +
-      " (" + candidate.completed + " completed)"
+      " saved record" + (candidate.sessions === 1 ? "" : "s") +
+      " (" + candidate.observedSessions + " observed; " +
+      candidate.completed + " completed)"
     );
 
   return [
     "**Lumen Relay local evidence summary**",
     "",
-    "- Saved sessions: **" + summary.totalSessions + "**",
-    "- Matched Double Pass coverage: **" +
+    "- Saved records: **" + summary.totalSessions + "**",
+    "- Matched Double Pass observed coverage: **" +
       summary.matchedDoublePass.timedSessions + " timed / " +
       summary.matchedDoublePass.stepSessions + " step**",
     "- Both matched Double Pass modes observed: **" +
@@ -107,7 +143,7 @@ export function evidenceSummaryText(summary) {
       ? ["- Records with unknown candidate IDs: **" + summary.unknownCandidates + "**"]
       : []),
     "",
-    "**Candidate coverage**",
+    "**Candidate saved-record coverage**",
     ...candidateLines,
     "",
     "**Evidence directions (session-level, not a company verdict)**",
@@ -116,9 +152,10 @@ export function evidenceSummaryText(summary) {
     "**Session results**",
     "- " + countLine(summary.results),
     "",
-    "**Environment coverage**",
+    "**Environment fields**",
     "- Devices: " + countLine(summary.devices),
     "- Inputs: " + countLine(summary.inputs),
+    "- `unreported` means the field was unknown/not recorded; it is not tested-device coverage.",
     "",
     "_This summary only counts locally saved observations. It does not score qualitative notes or choose Continue / Mutate / Replace._"
   ].join("\n");
