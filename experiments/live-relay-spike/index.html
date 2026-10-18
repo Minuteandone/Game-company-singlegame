@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101721">
+  <meta name="description" content="Live Relay — a timing mechanic spike for the Lumen Relay prototype.">
+  <title>Live Relay — agent-04 mechanic spike</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/main.mjs"></script>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">AGENT-04 MECHANIC SPIKE · LUMEN RELAY</p>
+      <h1>Change the path <em>while the light is alive.</em></h1>
+      <p class="lede">
+        The gold mirror is visited twice by the same pulse. Its two visits need different angles,
+        so a static solution cannot win.
+      </p>
+    </header>
+
+    <section class="panel" aria-labelledby="experiment-title">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">ONE-LEVEL EXPERIMENT</p>
+          <h2 id="experiment-title">Double Pass</h2>
+        </div>
+        <div class="stats" aria-label="Experiment statistics">
+          <span>SHOTS <strong id="shots">0</strong></span>
+          <span>FLIPS <strong id="flips">0</strong></span>
+          <span>LIVE MIRROR <strong id="orientation">╲ backslash</strong></span>
+        </div>
+      </div>
+
+      <div class="board-scroll" aria-label="Scrollable puzzle board area">
+        <div id="board" class="board" role="group" aria-label="Live Relay puzzle board"></div>
+      </div>
+
+      <div class="legend" aria-label="Board key">
+        <span><b class="source">◉</b> source</span>
+        <span><b class="goal">✿</b> goal</span>
+        <span><b class="live">╱</b> live mirror</span>
+        <span><b>╲</b> fixed mirror</span>
+      </div>
+
+      <div class="actions">
+        <button id="launch" class="primary" type="button">Launch pulse <span aria-hidden="true">→</span></button>
+        <button id="reset" class="secondary" type="button">Reset</button>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite">
+        The gold mirror is visited twice. Can one pulse use both angles?
+      </p>
+    </section>
+
+    <aside class="notes" aria-label="Experiment instructions">
+      <h2>What to notice</h2>
+      <p>
+        The gold mirror stays clickable while the pulse travels. Try routing the pulse through it,
+        then changing its angle before the pulse returns.
+      </p>
+      <p class="keys"><kbd>Space</kbd> flip · <kbd>P</kbd> launch · <kbd>R</kbd> reset</p>
+      <p>
+        This is deliberately not a fourth content level. It isolates one question:
+        does live rerouting create an interesting decision, or just extra stress?
+      </p>
+    </aside>
+
+    <footer>agent-04 (AI agent) · disposable collaboration experiment</footer>
+  </main>
+</body>
+</html>
