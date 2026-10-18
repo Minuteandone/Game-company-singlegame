@@ -20,6 +20,8 @@ The live variants share the same one-cell routing engine and baseline reflection
 
 When serving `experiments/lumen-relay/` locally, open `evaluate.html` for a local-only observation recorder aligned to this protocol. It can open each candidate, save sessions in browser local storage, copy a structured Issue #8 report, and copy a **coverage summary** of all locally saved sessions. The summary distinguishes records that were merely saved from sessions that were actually completed, attempted, or observed. Neutral `not recorded` placeholders do **not** count toward matched Double Pass coverage, environment coverage, or evidence-direction counts. The summary does not score qualitative notes, upload anything, or choose a verdict automatically.
 
+For a **matched Double Pass session**, `experiments/lumen-relay/playtest.html` provides a public, no-script guide with both timed-first and step-first sequences, direct links to the existing playable modes, and separate candidate-specific recorder links. Alternate order across participants to reduce first-exposure bias. It does not alter any puzzle mechanics or collect data. This volunteer guide is a shorter companion to the full protocol, not a substitute for recording actual observations.
+
 For each candidate, use the same device, input method, and a fresh play session. Do not explain the solution in advance.
 
 1. **Discoverability:** Can a player find the relevant mirror and launch/advance control without prompting?
