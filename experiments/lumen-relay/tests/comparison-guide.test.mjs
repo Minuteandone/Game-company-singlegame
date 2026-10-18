@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 const root = new URL("../", import.meta.url);
 
@@ -44,4 +46,26 @@ test("launcher and repository homepage expose the matched comparison guide", asy
 
   assert.match(modes, /href="\.\/compare\.html"/);
   assert.match(homepage, /href="\.\/experiments\/lumen-relay\/compare\.html"/);
+});
+
+
+test("every comparison guide local link resolves to a checked-in page or protocol", async () => {
+  const html = await readFile(new URL("./compare.html", root), "utf8");
+  const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map(match => match[1]);
+  const localLinks = hrefs.filter(href =>
+    href.startsWith("./") || href.startsWith("../"));
+  assert.ok(localLinks.length >= 12, "comparison guide should link games, recordings, and protocol");
+  for (const href of localLinks) {
+    const target = new URL(href, new URL("./compare.html", root));
+    assert.equal(target.protocol, "file:");
+    assert.ok(existsSync(fileURLToPath(target)), "Broken local comparison guide link: " + href);
+  }
+});
+
+test("the public comparison guide states opt-in sharing and avoids private data", async () => {
+  const html = await readFile(new URL("./compare.html", root), "utf8");
+  assert.match(html, /public GitHub evaluation issue is optional/);
+  assert.match(html, /leave out names, addresses, account information and other private details/);
+  assert.match(html, /stores notes only in this browser/);
+  assert.doesNotMatch(html, /<script\b/i, "a static guide needs no scripts or analytics");
 });
