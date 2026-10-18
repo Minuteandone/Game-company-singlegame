@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101e28">
+  <meta name="description" content="Compare the same Lumen Relay Double Pass puzzle with timed and player-paced controls, and record observations locally.">
+  <title>Lumen Relay — Matched Playtest Guide</title>
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    .test-shell{max-width:1100px;margin:0 auto;padding:0 clamp(18px,4vw,44px) 55px}
+    .test-head{padding:46px 0 30px;max-width:800px}
+    .test-head h1{font-size:clamp(43px,6vw,79px);letter-spacing:-.065em;line-height:1.05;margin:12px 0}
+    .test-head h1 span{color:var(--teal)}
+    .test-head p{color:#c1d5d3;font-size:clamp(15px,1.8vw,19px);line-height:1.65}
+    .test-head .eyebrow{font-size:12px;letter-spacing:.14em}
+    .test-meta{padding:14px 18px;border-left:3px solid #81d9c5;background:#18323a;border-radius:0 12px 12px 0}
+    .test-meta strong{color:#fff2c7}
+    .guide-heading{font-size:clamp(26px,3vw,34px);margin:22px 0 10px}
+    .guide-lead{line-height:1.65;color:#bdcfcb;max-width:790px}
+    .order-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0 34px}
+    .order-card{padding:clamp(21px,3vw,30px);border:1px solid #52736f;border-radius:22px;background:linear-gradient(145deg,#1c3b42,#142b35)}
+    .order-card h3{margin:8px 0 9px;font-size:clamp(24px,2.8vw,31px);letter-spacing:-.025em}
+    .order-card p{line-height:1.55;color:#c0d4d2;font-size:14px}
+    .order-tag{font-size:11px;color:#ffdc99;font-weight:850;letter-spacing:.14em}
+    .sequence{display:grid;gap:14px;margin-top:24px}
+    .sequence-item{padding:15px;background:#0e242b;border:1px solid #3a6061;border-radius:14px}
+    .sequence-item h4{font-size:16px;margin:0 0 7px;color:#f0f8ed}
+    .sequence-item p{margin:0 0 12px;font-size:13px;line-height:1.6}
+    .sequence-links{display:grid;gap:8px}
+    .sequence-links a{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:46px;padding:10px 14px;border-radius:9px;border:1px solid #7fc3b5;background:#9ce9d3;color:#123136;text-decoration:none;font-weight:850;font-size:14px}
+    .sequence-links a:hover{background:#c0fff0}
+    .sequence-links a.secondary-link{border-color:#648e9b;background:#284c58;color:#f1faf7}
+    .sequence-links a.secondary-link:hover{background:#335e69}
+    .focus-panel{background:#142b35;border:1px solid #41636c;border-radius:18px;padding:clamp(18px,3vw,30px);margin-bottom:22px}
+    .focus-panel h2{margin:0 0 12px;font-size:clamp(23px,3vw,30px)}
+    .focus-panel ul{padding-left:22px;margin:0;color:#c3d7d4;line-height:1.8}
+    .privacy{font-size:13px;line-height:1.7;color:#b5cbc9}
+    .footer-nav{display:flex;flex-wrap:wrap;gap:18px;border-top:1px solid #3c6566;padding-top:20px}
+    .footer-nav a{color:#b6f3dc;text-underline-offset:4px}
+    @media(max-width:760px){.order-grid{grid-template-columns:1fr}.test-head{padding-top:25px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div class="test-shell">
+    <header class="topbar">
+      <a class="brand" href="./modes.html" aria-label="Return to five game modes"><span class="brand-mark">✳</span> LUMEN LAB</a>
+      <span class="prototype-tag">MATCHED PUZZLE · VOLUNTARY EVALUATION</span>
+    </header>
+    <main>
+      <div class="test-head">
+        <div class="eyebrow"><span class="small-star">✦</span> TEST THE CONTROL, NOT A NEW PUZZLE</div>
+        <h1>One puzzle.<br><span>Two paces.</span></h1>
+        <p>Compare <strong>Double Pass</strong> with its player-paced counterpart. Both versions use the <strong>same board, mirrors, receiver and routing rules</strong>. The main difference is whether the pulse moves automatically or only when you choose to advance it.</p>
+        <p class="test-meta"><strong>No winner has been chosen.</strong> We want real observations about clarity, fairness and what makes the light interesting—not a made-up score or a preferred outcome.</p>
+      </div>
+
+      <section aria-labelledby="choose-order">
+        <h2 id="choose-order" class="guide-heading">Choose a testing order</h2>
+        <p class="guide-lead">Complete one sequence below. When testing several people, alternate between Sequence A and Sequence B so the version played first does not always have a learning advantage. If you cannot finish a puzzle, that attempt is still useful evidence.</p>
+
+        <div class="order-grid">
+          <article class="order-card" id="timed-first" aria-labelledby="order-a">
+            <div class="order-tag">SEQUENCE A · TIMED FIRST</div>
+            <h3 id="order-a">Watch the moving light.</h3>
+            <p>Start with real-time routing, then test the exact same puzzle without reaction-time pressure.</p>
+            <div class="sequence">
+              <div class="sequence-item">
+                <h4>1 · Play timed Double Pass</h4>
+                <p>Launch the pulse; rotate the gold mirror while the light is travelling.</p>
+                <div class="sequence-links">
+                  <a href="./spikes/double-pass.html">Play timed Double Pass <span aria-hidden="true">→</span></a>
+                  <a class="secondary-link" href="./evaluate.html?candidate=double-pass">Record this timed attempt <span aria-hidden="true">↗</span></a>
+                </div>
+              </div>
+              <div class="sequence-item">
+                <h4>2 · Play Double Pass Step</h4>
+                <p>Advance the pulse manually and rotate the same mirror between visits.</p>
+                <div class="sequence-links">
+                  <a href="./spikes/step-routing.html?level=double-pass">Play Double Pass Step <span aria-hidden="true">→</span></a>
+                  <a class="secondary-link" href="./evaluate.html?candidate=double-pass-step">Record this step attempt <span aria-hidden="true">↗</span></a>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="order-card" id="step-first" aria-labelledby="order-b">
+            <div class="order-tag">SEQUENCE B · STEP FIRST</div>
+            <h3 id="order-b">Set your own pace.</h3>
+            <p>Begin with player-controlled steps, then try moving light with real-time timing.</p>
+            <div class="sequence">
+              <div class="sequence-item">
+                <h4>1 · Play Double Pass Step</h4>
+                <p>Advance the pulse one cell at a time; there is no reaction-time requirement.</p>
+                <div class="sequence-links">
+                  <a href="./spikes/step-routing.html?level=double-pass">Play Double Pass Step <span aria-hidden="true">→</span></a>
+                  <a class="secondary-link" href="./evaluate.html?candidate=double-pass-step">Record this step attempt <span aria-hidden="true">↗</span></a>
+                </div>
+              </div>
+              <div class="sequence-item">
+                <h4>2 · Play timed Double Pass</h4>
+                <p>See whether the same required mirror change feels different while the pulse moves on its own.</p>
+                <div class="sequence-links">
+                  <a href="./spikes/double-pass.html">Play timed Double Pass <span aria-hidden="true">→</span></a>
+                  <a class="secondary-link" href="./evaluate.html?candidate=double-pass">Record this timed attempt <span aria-hidden="true">↗</span></a>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="focus-panel" aria-labelledby="observe">
+        <h2 id="observe">What should you notice?</h2>
+        <ul>
+          <li>Could you identify the mirror and what to do without instructions beyond the game page?</li>
+          <li>After a failed run, could you explain why the light went where it did?</li>
+          <li>Did real-time movement add anticipation—or mostly pressure to react quickly?</li>
+          <li>Did manual stepping make decisions clearer, or make the route feel slow?</li>
+          <li>Were the controls comfortable for your input method (keyboard, mouse, touch or assistive technology)?</li>
+          <li>Would you choose to try a harder puzzle in either style?</li>
+        </ul>
+      </section>
+
+      <section class="focus-panel" aria-labelledby="record">
+        <h2 id="record">Record two separate observations</h2>
+        <p class="privacy">Use each <strong>Record this attempt</strong> link after trying that version. The recorder preselects the correct puzzle and stores any saved notes <strong>only in this browser</strong>. It does not upload gameplay analytics or invent an evaluation result. Choose <em>Attempted, not completed</em> if you tried but did not solve it. Mark untested details as unknown.</p>
+        <p class="privacy">If you choose to share findings, the recorder can copy each report or a coverage summary to paste into <a href="https://github.com/Minuteandone/Game-company-singlegame/issues/8">the public evaluation issue</a>. Sharing is optional; avoid including identifying information or private details in a public report.</p>
+        <p class="privacy"><strong>To keep the comparison fair:</strong> try each version before reading its hint if possible, and record if you needed a hint or extra explanation. Do not change the puzzle rules or claim a preference based only on automated tests.</p>
+      </section>
+    </main>
+
+    <footer class="footer-nav">
+      <a href="./modes.html">All five playable modes</a>
+      <a href="./evaluate.html">Open playtest recorder</a>
+      <a href="../../docs/live-routing-evaluation.md">Full evaluation protocol</a>
+    </footer>
+  </div>
+</body>
+</html>
