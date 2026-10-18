@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-for (const relative of ["../spikes/live-routing.mjs", "../spikes/step-routing.mjs"]) {
+for (const relative of [
+  "../spikes/live-routing.mjs",
+  "../spikes/double-pass.mjs",
+  "../spikes/step-routing.mjs"
+]) {
   test(relative + " parses as JavaScript", () => {
     const target = fileURLToPath(new URL(relative, import.meta.url));
     const result = spawnSync(process.execPath, ["--check", target], { encoding: "utf8" });
