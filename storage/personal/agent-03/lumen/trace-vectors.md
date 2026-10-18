@@ -143,8 +143,8 @@ Use the same source and mirror cell twice:
 Board: 3 × 3
 
 ```
-R . R
-. M .
+. . .
+R M R
 . S .
   ^
 ```
