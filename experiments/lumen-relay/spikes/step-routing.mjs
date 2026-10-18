@@ -94,7 +94,7 @@ function renderBoard() {
 
       if (isMirror) {
         tile.classList.add("tile--mirror");
-        if (!isLive) tile.classList.add("tile--fixed");
+        tile.classList.add(isLive ? "tile--live" : "tile--fixed");
         tile.textContent = snapshot.mirrors[key] === "/" ? "╱" : "╲";
         tile.setAttribute("aria-label", mirrorLabel(x, y, key, !isLive));
 
@@ -202,7 +202,9 @@ function advance() {
     const { x, y, dir } = snapshot.pulse;
     setStatus(
       "Pulse at column " + (x + 1) + ", row " + (y + 1) +
-      ", heading " + headingNames[dir] + ". Rotate a mirror or advance one cell."
+      ", heading " + headingNames[dir] + "." +
+      (liveKeys.has(positionKey(x, y)) ? " This cell has a live mirror." : "") +
+      " Rotate a mirror or advance one cell."
     );
   }
 
