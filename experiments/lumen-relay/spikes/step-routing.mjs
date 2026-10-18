@@ -205,7 +205,9 @@ function begin() {
 }
 
 function advance() {
-  const focusBeginOnFinish = document.activeElement === elements.advance;
+  const focused = document.activeElement;
+  const focusBeginOnFinish = focused === elements.advance ||
+    (focused?.dataset?.key && liveKeys.has(focused.dataset.key));
   const before = session.snapshot;
   if (!state.begun || before.pulse.outcome) return;
 
