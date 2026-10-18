@@ -31,6 +31,10 @@
     .saved-item{border:1px solid #30495a;border-radius:12px;padding:12px;background:#0c1923}
     .saved-head{display:flex;justify-content:space-between;gap:14px;align-items:start}
     .saved-head strong{display:block}
+    .saved-tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .saved-tools button{min-height:44px;border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}
+    .saved-tools button:disabled{cursor:not-allowed;opacity:.55}
+    .evidence-summary{margin:14px 0 4px;padding:12px 14px;border-left:3px solid #7de7dc;background:#132735;border-radius:0 9px 9px 0;color:#c7ded9;line-height:1.55}
     .saved-meta{color:#91a8b3;font-size:12px;margin-top:3px}
     .saved-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
     .saved-actions button{border:1px solid #506979;border-radius:7px;background:#172b39;color:#edf8fb;padding:7px 10px;cursor:pointer}
@@ -185,8 +189,12 @@
           <h2 id="saved-title">Saved local sessions</h2>
           <p class="small">Records remain only in this browser until you copy or delete them.</p>
         </div>
-        <button id="clear-saved" class="danger-action" type="button">Delete all saved sessions</button>
+        <div class="saved-tools">
+          <button id="copy-summary" class="secondary-action" type="button" disabled>Copy evidence summary</button>
+          <button id="clear-saved" class="danger-action" type="button">Delete all saved sessions</button>
+        </div>
       </div>
+      <p id="evidence-summary" class="evidence-summary">No saved evidence yet. Summary counts will appear after local sessions are recorded.</p>
       <div id="saved-list" class="saved-list"></div>
     </section>
   </main>
