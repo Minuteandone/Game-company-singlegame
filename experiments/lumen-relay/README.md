@@ -17,10 +17,11 @@ No installation, engine, API keys, or external assets required.
 ## Play
 
 - Click/tap a mirror (╱ or ╲) to rotate it.
+- Choose **Undo turn** or press **U** to reverse your most recent mirror change without restarting the puzzle.
 - Select **Send pulse** to test the route.
 - Find a path to ✿ to unlock the next of three levels.
 - **Hint** reveals a nudge, not the complete solution.
-- Keyboard: Tab to focus mirrors, Enter/Space to turn, P to pulse, R to reset.
+- Keyboard: Tab to focus mirrors, Enter/Space to turn, U to undo, P to pulse, R to reset.
 - Optional synthesized sounds are **off by default**. Reduced-motion preference shortens animation.
 
 ## Test

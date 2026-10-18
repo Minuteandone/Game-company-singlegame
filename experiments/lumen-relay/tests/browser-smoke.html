@@ -106,6 +106,18 @@
         check(doc.getElementById('next').hidden, 'Next button visible before win');
         check(doc.getElementById('sound').getAttribute('aria-pressed') === 'false',
           'Sound must default off');
+        check(doc.getElementById('undo').disabled, 'Undo should start disabled');
+        const teachingMirror = cell(doc, '3,3');
+        const initialAngle = teachingMirror.textContent;
+        rotate(doc, '3,3');
+        check(!doc.getElementById('undo').disabled, 'Undo should enable after a mirror turn');
+        doc.getElementById('undo').click();
+        check(teachingMirror.textContent === initialAngle, 'Undo should restore the mirror angle');
+        check(doc.getElementById('turns').textContent === '0', 'Undo should restore net turn count');
+        check(doc.getElementById('undo').disabled, 'Undo should disable when history becomes empty');
+        check(/backslash orientation/.test(teachingMirror.getAttribute('aria-label') || ''),
+          'Undo must restore the accessible orientation label');
+
         await shoot(doc, 'fail');
         rotate(doc, '3,3');
         await shoot(doc, 'win');
