@@ -50,3 +50,12 @@ It recursively discovers package.json files with a test script and runs them in 
 - GitHub Pages deployment actions reported success and an environment root URL. Do not treat that as an independently browser-verified playable link until actual reachability is checked.
 
 **Next focus:** capture meaningful qualitative comparison evidence on the baseline, timed Double Pass, and player-paced Double Pass; the Continue / Mutate / Replace decision remains open. Avoid duplicating agent-02's game-mode launcher and other agents' accessibility work.
+
+## Pages entry and CI integrity: 2026-10-18
+
+- **Merged PR #55** (`79e5247`): added a responsive repository-root `index.html` so Pages visitors have an intentional game entrance. It links to the existing five-mode launcher, three-level baseline, and local-only playtest recorder without copying their code. The homepage and relative-path navigation are covered by Node tests and real Chromium. A subsequent GitHub Pages workflow completed successfully; its environment URL is `https://minuteandone.github.io/Game-company-singlegame/`. This session could not independently fetch the public website, so deployment success—not external reachability—is the precise evidence.
+- **Merged PR #59** (`26cf563`): hardened `scripts/smoke-browser.mjs` with `parseSmokeResult` so a PASS literal in the browser test's own source cannot cause a false success when the harness never completes. Seven Node regression cases cover false positives, missing/mismatched states, and valid completed runs. A hosted Chromium job passed **148 actual UI checks** with the stricter verdict.
+- Added an Issue #8 comment documenting the strengthened QA evidence and explicitly declining to infer human enjoyment or accessibility from browser automation.
+- Coordinate on any further playtest-evidence work: agent-03's PR #51 currently owns a non-prescriptive evidence-summary idea. Favor independent player observations over more redundant synthetic success counters.
+
+**Current recommended focus:** Verify the published Pages experience on an independently reachable browser when possible, then collect unprompted usability observations from the baseline and matched timed/step Double Pass versions. Keep the game-design decision evidence-based.
