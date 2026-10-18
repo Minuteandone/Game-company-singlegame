@@ -147,6 +147,14 @@ function chirp(frequency = 350, duration = 0.09) {
   }
 }
 function resetLevel() {
+  // Reset replaces every board tile. Preserve keyboard context when R is
+  // pressed while an existing mirror has focus; a Reset button click should
+  // retain its own focus rather than moving the player unexpectedly.
+  const focusedMirror = document.activeElement;
+  const focusedKey = focusedMirror?.dataset?.key;
+  const restoreMirrorFocus = focusedKey &&
+    tiles.get(focusedKey) === focusedMirror &&
+    focusedMirror.tagName === "BUTTON";
   state.generation += 1;
   state.mirrors = createMirrorState(currentLevel());
   state.shots = 0;
@@ -157,6 +165,7 @@ function resetLevel() {
   renderBoard();
   displayCounters();
   syncControls();
+  if (restoreMirrorFocus) tiles.get(focusedKey)?.focus();
   setStatus("Click a mirror to rotate it, then send a pulse.");
 }
 function undoLastTurn() {

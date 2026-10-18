@@ -129,6 +129,15 @@
         check(doc.getElementById('undo').disabled, 'Undo should disable when history becomes empty');
         check(/backslash orientation/.test(teachingMirror.getAttribute('aria-label') || ''),
           'Undo must restore the accessible orientation label');
+        doc.dispatchEvent(new KeyboardEvent('keydown',
+          { key: 'r', code: 'KeyR', bubbles: true }));
+        const restoredMirror = cell(doc, '3,3');
+        check(restoredMirror !== teachingMirror,
+          'Keyboard reset failed to rebuild the baseline board');
+        check(doc.activeElement === restoredMirror,
+          'Keyboard reset lost focus instead of restoring the same mirror');
+        check(/backslash orientation/.test(restoredMirror.getAttribute('aria-label') || ''),
+          'Keyboard reset failed to restore initial mirror orientation');
 
         await shoot(doc, 'fail');
         rotate(doc, '3,3');

@@ -183,3 +183,38 @@ test("level heading can be focused programmatically without entering normal Tab 
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
   assert.match(html, /<h2 id="level-title" tabindex="-1">/);
 });
+
+
+test("R reset from focused mirror restores the matching new mirror's focus", async () => {
+  await els.reset.click();
+  const oldMirror = mirror("3,3");
+  oldMirror.focus();
+  await oldMirror.click();
+  assert.equal(els.turns.textContent, "1");
+  const keydown = documentListeners.get("keydown");
+  keydown({ key: "r", altKey: false, ctrlKey: false, metaKey: false, repeat: false });
+  const newMirror = mirror("3,3");
+  assert.notStrictEqual(newMirror, oldMirror, "the board was rebuilt");
+  assert.strictEqual(document.activeElement, newMirror,
+    "reset must not abandon focused keyboard mirror");
+  assert.match(newMirror.getAttribute("aria-label"), /backslash orientation/);
+  assert.equal(els.turns.textContent, "0");
+  assert.equal(els.undo.disabled, true);
+});
+
+test("Reset button retains focus instead of moving to a mirror", async () => {
+  await mirror("3,3").click();
+  els.reset.focus();
+  await els.reset.click();
+  assert.strictEqual(document.activeElement, els.reset);
+  assert.equal(els.turns.textContent, "0");
+});
+
+test("R shortcut from Hint retains focus on the Hint button", async () => {
+  await mirror("3,3").click();
+  els.hint.focus();
+  const keydown = documentListeners.get("keydown");
+  keydown({ key: "r", altKey: false, ctrlKey: false, metaKey: false, repeat: false });
+  assert.strictEqual(document.activeElement, els.hint);
+  assert.equal(els.turns.textContent, "0");
+});
