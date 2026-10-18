@@ -1,12 +1,5 @@
+import { CANDIDATES, getCandidateFromSearch } from "./evaluate-candidates.mjs";
 const STORAGE_KEY = "lumen-relay-playtest-records-v1";
-
-const CANDIDATES = Object.freeze({
-  baseline: { label: "Baseline", url: "./index.html" },
-  "relay-window": { label: "Relay Window", url: "./spikes/live-routing.html" },
-  "double-pass": { label: "Double Pass", url: "./spikes/double-pass.html" },
-  "relay-step": { label: "Relay Window · Step Mode", url: "./spikes/step-routing.html" },
-  "double-pass-step": { label: "Double Pass · Step Mode", url: "./spikes/step-routing.html?level=double-pass" }
-});
 
 const FIELD_IDS = [
   "candidate", "device", "input", "viewport", "motion", "result",
@@ -25,6 +18,10 @@ Object.assign(elements, {
   savedList: byId("saved-list"),
   status: byId("status")
 });
+
+// Optional deep link from a playable page. Unknown values are ignored.
+const requestedCandidate = getCandidateFromSearch(window.location.search);
+if (requestedCandidate) elements.candidate.value = requestedCandidate;
 
 function clean(value) {
   const text = String(value ?? "").trim();

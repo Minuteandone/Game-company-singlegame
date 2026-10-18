@@ -54,7 +54,8 @@ class Element {
 
 const ids = [
   "board", "begin", "advance", "reset", "hint", "status",
-  "steps", "turns", "level-title", "level-subtitle", "timed-variant"
+  "steps", "turns", "level-title", "level-subtitle", "timed-variant", "record-this-mode",
+  "record-this-mode"
 ];
 const els = Object.fromEntries(ids.map(id => [id, new Element()]));
 const links = [
