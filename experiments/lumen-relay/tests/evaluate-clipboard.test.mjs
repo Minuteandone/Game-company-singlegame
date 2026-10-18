@@ -38,7 +38,7 @@ const fieldIds = [
 ];
 const otherIds = [
   "open-candidate", "save-session", "copy-current", "reset-form",
-  "clear-saved", "saved-list", "status",
+  "clear-saved", "copy-summary", "evidence-summary", "saved-list", "status",
   "manual-copy-panel", "manual-copy-text", "select-manual-copy"
 ];
 const els = Object.fromEntries([...fieldIds, ...otherIds]
@@ -159,4 +159,13 @@ test("clearing the observation form never leaves a false completed result", asyn
   assert.equal(els.discoverability.value, "");
   assert.equal(els.result.value, "not recorded");
   assert.equal(els.verdict.value, "inconclusive");
+});
+
+
+test("saved observed sessions update the local evidence summary without choosing a winner", async () => {
+  assert.equal(els["copy-summary"].disabled, false);
+  assert.match(els["evidence-summary"].textContent, /1 saved session; 1 observed/);
+  assert.match(els["evidence-summary"].textContent, /0 timed \/ 1 step/);
+  assert.match(els["evidence-summary"].textContent, /inconclusive: 1/);
+  assert.doesNotMatch(els["evidence-summary"].textContent, /winner|recommended/i);
 });
