@@ -176,7 +176,7 @@ test("completing all three puzzles and replaying returns focus to First Light", 
   assert.equal(els["level-title"].textContent, "First Light");
   assert.strictEqual(document.activeElement, els["level-title"]);
   assert.equal(els.undo.disabled, true);
-  assert.equal(els.explore.hidden, true);
+  assert.equal(els["explore-after-win"].hidden, true);
 });
 
 test("level heading can be focused programmatically without entering normal Tab order", async () => {
