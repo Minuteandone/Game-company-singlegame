@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101e28">
+  <meta name="description" content="Choose how to play and compare the Lumen Relay light-routing puzzle experiments.">
+  <title>Lumen Relay — Choose a Game Mode</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./modes.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="Back to Lumen Relay baseline"><span class="brand-mark">✳</span> LUMEN LAB</a>
+      <span class="prototype-tag">SHARED GAME · MECHANIC LAB</span>
+    </header>
+
+    <main>
+      <div class="intro mode-intro">
+        <div class="eyebrow"><span class="small-star">✦</span> CHOOSE YOUR SIGNAL</div>
+        <h1>One light.<br><span>Five ways to play.</span></h1>
+        <p>Every experiment uses the same mirror-reflection rules. Choose a puzzle, try a different control style, and discover whether planning, timing, or player-paced stepping feels better.</p>
+      </div>
+
+      <section aria-labelledby="modes-heading" class="mode-section">
+        <div class="mode-section-heading">
+          <h2 id="modes-heading">Playable experiments</h2>
+          <p>Each mode runs locally in your browser. No account or download required.</p>
+        </div>
+
+        <div class="mode-grid">
+          <article class="mode-card mode-card--baseline" aria-labelledby="mode-baseline">
+            <p class="mode-number">01 · ORIGINAL GAME</p>
+            <h3 id="mode-baseline">Signal Garden</h3>
+            <p>Turn mirrors before launching the light. Three short levels teach the rules at your own pace.</p>
+            <p class="mode-detail"><span class="mode-symbol" aria-hidden="true">✿</span> Plan the route, then see the result</p>
+            <a href="./index.html" aria-label="Play Signal Garden baseline">Play Signal Garden <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="mode-card" aria-labelledby="mode-window">
+            <p class="mode-number">02 · LIVE ROUTING</p>
+            <h3 id="mode-window">Relay Window</h3>
+            <p>The pulse moves while mirrors remain adjustable. Try turning both live mirrors as it travels.</p>
+            <p class="mode-detail"><span class="mode-symbol" aria-hidden="true">↗</span> Easier timing experiment</p>
+            <a href="./spikes/live-routing.html" aria-label="Play real-time Relay Window">Play Relay Window <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="mode-card mode-card--feature" aria-labelledby="mode-double">
+            <p class="mode-number">03 · LIVE TIMING CHALLENGE</p>
+            <h3 id="mode-double">Double Pass</h3>
+            <p>One gold mirror must redirect the same light twice. Change it after the first visit, before the return.</p>
+            <p class="mode-detail"><span class="mode-symbol" aria-hidden="true">◇</span> A genuinely timed decision</p>
+            <a href="./spikes/double-pass.html" aria-label="Play real-time Double Pass">Play Double Pass <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="mode-card" aria-labelledby="mode-step-window">
+            <p class="mode-number">04 · PLAYER-PACED CONTROL</p>
+            <h3 id="mode-step-window">Relay Window · Step</h3>
+            <p>Same Relay Window puzzle. Press <strong>Advance one cell</strong> whenever you choose; the light never moves on a timer.</p>
+            <p class="mode-detail"><span class="mode-symbol" aria-hidden="true">▸</span> No reaction time required</p>
+            <a href="./spikes/step-routing.html" aria-label="Play player-paced Relay Window step mode">Play Relay Window Step <span aria-hidden="true">→</span></a>
+          </article>
+
+          <article class="mode-card mode-card--feature" aria-labelledby="mode-step-double">
+            <p class="mode-number">05 · MATCHED CONTROL COMPARISON</p>
+            <h3 id="mode-step-double">Double Pass · Step</h3>
+            <p>Exactly the same Double Pass board and route rules as mode 03, without a clock. Choose when to advance and flip.</p>
+            <p class="mode-detail"><span class="mode-symbol" aria-hidden="true">⏵</span> Compare timing against planning</p>
+            <a href="./spikes/step-routing.html?level=double-pass" aria-label="Play player-paced Double Pass step mode">Play Double Pass Step <span aria-hidden="true">→</span></a>
+          </article>
+        </div>
+      </section>
+
+      <section class="mode-evaluation" aria-labelledby="evaluation-heading">
+        <div>
+          <p class="mode-number">HELP SHAPE THE SHARED GAME</p>
+          <h2 id="evaluation-heading">Which way feels best?</h2>
+          <p>For a useful comparison, play <strong>Double Pass</strong> (03) and <strong>Double Pass · Step</strong> (05). They share puzzle geometry; the main change is whether the light advances in real time or on your command.</p>
+          <p class="mode-privacy">Playtest notes are stored locally in your browser until you choose to copy them. No gameplay analytics are sent automatically.</p>
+        </div>
+        <a class="mode-recorder-link" href="./evaluate.html" aria-label="Open the Lumen Relay playtest recorder">Open playtest recorder <span aria-hidden="true">→</span></a>
+      </section>
+    </main>
+
+    <footer class="mode-footer">LUMEN RELAY <span aria-hidden="true">✦</span> ONE COLLABORATIVE GAME <span aria-hidden="true">✦</span> EXPERIMENTS, NOT A FINAL DESIGN DECISION</footer>
+  </div>
+</body>
+</html>
