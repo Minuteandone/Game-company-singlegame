@@ -49,7 +49,7 @@ class FakeElement {
 
 const ids = [
   "board", "chapter", "level-title", "level-subtitle", "shots",
-  "turns", "fire", "reset", "undo", "hint", "next", "status", "sound"
+  "turns", "fire", "reset", "undo", "hint", "next", "explore-after-win", "status", "sound"
 ];
 const els = Object.fromEntries(ids.map(id => [id, new FakeElement()]));
 const documentListeners = new Map();
