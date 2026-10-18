@@ -12,9 +12,11 @@
   <iframe id="double-live" title="Timed Double Pass under test" src="../spikes/double-pass.html" width="1050" height="800"></iframe>
   <iframe id="mobile" title="375px baseline mobile layout" src="../index.html" width="375" height="760"></iframe>
   <iframe id="mobile-step" title="375px step mode mobile layout" src="../spikes/step-routing.html?level=double-pass" width="375" height="760"></iframe>
+  <iframe id="entry" title="Pages root game entry under test" src="../../../index.html" width="900" height="700"></iframe>
   <script>
     // Same-origin iframe exercises the actual browser UI without app-specific hooks.
     const report = document.getElementById('smoke-report');
+    const entry = document.getElementById('entry');
     const game = document.getElementById('game');
     const step = document.getElementById('step');
     const doubleStep = document.getElementById('double-step');
@@ -236,6 +238,17 @@
 
         mobileBoardCheck(mobile, '3,3');
         mobileBoardCheck(mobileStep, '4,3');
+
+        const entryDoc = entry.contentDocument;
+        check(Boolean(entryDoc.querySelector('main#game-entry')),
+          'Pages root did not load the game entry');
+        const choose = entryDoc.querySelector('a[href="./experiments/lumen-relay/modes.html"]');
+        check(Boolean(choose), 'Pages root is missing the mode selector link');
+        choose.click();
+        await until(() => entry.contentDocument.title.includes('Choose a Game Mode'),
+          'Pages root did not navigate to the game mode selector');
+        check(entry.contentDocument.querySelectorAll('.mode-card').length === 5,
+          'Pages entry did not reach all five playable modes');
 
         report.textContent = '__LUMEN_SMOKE_PASS__ ' + checks + ' checks';
         document.body.dataset.smoke = 'pass';
