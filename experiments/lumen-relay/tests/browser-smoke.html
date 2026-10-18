@@ -4,11 +4,15 @@
 <body>
   <h1>Lumen Relay browser smoke harness</h1>
   <pre id="smoke-report">SMOKE_RUNNING</pre>
-  <iframe id="game" title="Lumen Relay under test" src="../index.html" width="1050" height="800"></iframe>
+  <iframe id="game" title="Baseline Lumen Relay under test" src="../index.html" width="1050" height="800"></iframe>
+  <iframe id="step" title="Relay Window step mode under test" src="../spikes/step-routing.html" width="1050" height="800"></iframe>
+  <iframe id="double-step" title="Double Pass step mode under test" src="../spikes/step-routing.html?level=double-pass" width="1050" height="800"></iframe>
   <script>
     // Same-origin iframe exercises the actual browser UI without app-specific hooks.
     const report = document.getElementById('smoke-report');
     const game = document.getElementById('game');
+    const step = document.getElementById('step');
+    const doubleStep = document.getElementById('double-step');
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     let checks = 0;
     function check(condition, message) {
@@ -43,6 +47,20 @@
       fire.click();
       await until(() => doc.getElementById('status').dataset.state === expectedState,
         'Pulse did not report ' + expectedState);
+    }
+    function playStepMode(doc, flips, beforeFlips = 0) {
+      check(Boolean(doc), 'Step mode iframe did not load');
+      check(doc.getElementById('advance').disabled, 'Advance enabled before beginning');
+      doc.getElementById('begin').click();
+      check(!doc.getElementById('advance').disabled, 'Begin did not enable step controls');
+      for (let i = 0; i < beforeFlips; i++) doc.getElementById('advance').click();
+      for (const coordinates of flips) rotate(doc, coordinates);
+      let advances = 0;
+      while (doc.getElementById('status').dataset.state === 'ready' && advances++ < 60) {
+        doc.getElementById('advance').click();
+      }
+      check(advances < 60, 'Step mode got stuck without terminal outcome');
+      return doc.getElementById('status').dataset.state;
     }
     async function run() {
       try {
@@ -88,6 +106,27 @@
         check(doc.getElementById('status').dataset.state === 'ready',
           'Cancelled in-flight pulse mutated reset state');
         check(doc.getElementById('next').hidden, 'Reset leaked completed-level state');
+
+        const stepDoc = step.contentDocument;
+        check(stepDoc.getElementById('level-title').textContent === 'Relay Window',
+          'Step mode did not load Relay Window');
+        check(playStepMode(stepDoc, ['2,4', '6,1']) === 'win',
+          'Relay Window step mode did not complete correctly');
+        check(stepDoc.getElementById('turns').textContent === '2',
+          'Step mode did not count both rotations');
+        stepDoc.getElementById('reset').click();
+        check(stepDoc.getElementById('steps').textContent === '0', 'Step-mode reset did not clear steps');
+
+        const doubleDoc = doubleStep.contentDocument;
+        check(doubleDoc.getElementById('level-title').textContent === 'Double Pass',
+          'Step mode did not select Double Pass fixture');
+        check(playStepMode(doubleDoc, ['4,3']) === 'fail',
+          'Premature Double Pass rotation should fail');
+        doubleDoc.getElementById('reset').click();
+        check(playStepMode(doubleDoc, ['4,3'], 2) === 'win',
+          'Between-visits Double Pass rotation should win without a timer');
+        check(doubleDoc.getElementById('turns').textContent === '1',
+          'Double Pass step win should require one rotation');
 
         report.textContent = '__LUMEN_SMOKE_PASS__ ' + checks + ' checks';
         document.body.dataset.smoke = 'pass';
