@@ -40,13 +40,27 @@ function loadRecords() {
 }
 
 function saveRecords(records) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function clearRecords() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function currentRecord() {
   const candidate = elements.candidate.value;
   return {
-    id: crypto.randomUUID?.() ?? String(Date.now()),
+    id: globalThis.crypto?.randomUUID?.() ?? String(Date.now()),
     recordedAt: new Date().toISOString(),
     candidate,
     candidateLabel: CANDIDATES[candidate]?.label ?? candidate,
@@ -178,7 +192,11 @@ function renderRecords() {
     remove.type = "button";
     remove.textContent = "Delete";
     remove.addEventListener("click", () => {
-      saveRecords(loadRecords().filter(entry => entry.id !== record.id));
+      const saved = saveRecords(loadRecords().filter(entry => entry.id !== record.id));
+      if (!saved) {
+        setStatus("Local storage is unavailable; the saved session could not be deleted.");
+        return;
+      }
       renderRecords();
       setStatus("Saved session deleted.");
     });
@@ -199,7 +217,10 @@ elements.openCandidate.addEventListener("click", () => {
 elements.saveSession.addEventListener("click", () => {
   const records = loadRecords();
   records.push(currentRecord());
-  saveRecords(records);
+  if (!saveRecords(records)) {
+    setStatus("Local storage is unavailable. Your form is still intact; use Copy current Issue #8 report instead.");
+    return;
+  }
   renderRecords();
   setStatus("Session saved locally. Nothing was uploaded.");
 });
@@ -213,7 +234,10 @@ elements.resetForm.addEventListener("click", resetForm);
 
 elements.clearSaved.addEventListener("click", () => {
   if (!confirm("Delete all locally saved Lumen Relay playtest sessions in this browser?")) return;
-  localStorage.removeItem(STORAGE_KEY);
+  if (!clearRecords()) {
+    setStatus("Local storage is unavailable; saved sessions could not be cleared.");
+    return;
+  }
   renderRecords();
   setStatus("All local playtest sessions deleted.");
 });
