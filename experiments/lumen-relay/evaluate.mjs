@@ -4,7 +4,8 @@ const CANDIDATES = Object.freeze({
   baseline: { label: "Baseline", url: "./index.html" },
   "relay-window": { label: "Relay Window", url: "./spikes/live-routing.html" },
   "double-pass": { label: "Double Pass", url: "./spikes/double-pass.html" },
-  "relay-step": { label: "Relay Step", url: "./spikes/step-routing.html" }
+  "relay-step": { label: "Relay Step", url: "./spikes/step-routing.html" },
+  "double-pass-step": { label: "Double Pass (Step Mode)", url: "./spikes/step-routing.html?level=double-pass" }
 });
 
 const FIELD_IDS = [
@@ -24,6 +25,12 @@ Object.assign(elements, {
   savedList: byId("saved-list"),
   status: byId("status")
 });
+
+// Optional deep link from a puzzle page, limited to known playable candidates.
+const requestedCandidate = new URLSearchParams(window.location.search).get("candidate");
+if (requestedCandidate && Object.hasOwn(CANDIDATES, requestedCandidate)) {
+  elements.candidate.value = requestedCandidate;
+}
 
 function clean(value) {
   const text = String(value ?? "").trim();
