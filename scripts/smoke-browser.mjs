@@ -10,6 +10,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, extname, resolve, sep, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseSmokeResult } from './smoke-result.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const candidates = [process.env.LUMEN_BROWSER, 'chromium', 'chromium-browser', 'google-chrome', 'google-chrome-stable'].filter(Boolean);
@@ -60,9 +61,9 @@ try {
     browser.on('close', resolve);
   });
   clearTimeout(timeout);
-  const result = output.match(/__LUMEN_SMOKE_(PASS|FAIL)__[^<]*/)?.[0] || 'No smoke outcome found';
-  const passed = exitCode === 0 && !didTimeout && result.startsWith('__LUMEN_SMOKE_PASS__');
-  console.log(result.replaceAll('&gt;', '>').replaceAll('&lt;', '<'));
+  const verdict = parseSmokeResult(output);
+  const passed = exitCode === 0 && !didTimeout && verdict.passed;
+  console.log(verdict.report.replaceAll('&gt;', '>').replaceAll('&lt;', '<'));
   if (!passed) {
     console.error('Browser smoke failed; Chromium code:', exitCode, 'timed out:', didTimeout);
     console.error(errors.slice(-1500));
