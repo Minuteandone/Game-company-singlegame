@@ -139,3 +139,24 @@ test("copying a saved session uses saved evidence, not the newer form contents",
   assert.match(els["manual-copy-text"].value, /Saved original observation/);
   assert.doesNotMatch(els["manual-copy-text"].value, /Form changed after saving/);
 });
+
+
+test("the untouched recorder does not invent a completed playtest or device", async () => {
+  const html = await readFile(new URL("../evaluate.html", import.meta.url), "utf8");
+  assert.match(html, /<select id="device">\s*<option value="not recorded" selected>/);
+  assert.match(html, /<select id="input">\s*<option value="not recorded" selected>/);
+  assert.match(html, /<option value="unknown" selected>Unknown \/ not recorded<\/option>/);
+  assert.match(html, /<option value="not tested" selected>Not tested \/ unknown<\/option>/);
+  assert.match(html, /<option value="not recorded" selected>Not recorded<\/option>/);
+  assert.match(html, /Select Completed only after the puzzle was actually solved/);
+});
+
+test("clearing the observation form never leaves a false completed result", async () => {
+  els.discoverability.value = "A prior session";
+  els.result.value = "completed";
+  els.verdict.value = "mutate with live routing";
+  await els["reset-form"].click();
+  assert.equal(els.discoverability.value, "");
+  assert.equal(els.result.value, "not recorded");
+  assert.equal(els.verdict.value, "inconclusive");
+});
