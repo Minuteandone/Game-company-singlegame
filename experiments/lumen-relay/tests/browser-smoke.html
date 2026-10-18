@@ -180,6 +180,12 @@
         recorderDoc.getElementById('save-session').click();
         check(recorderDoc.querySelectorAll('#saved-list .saved-item').length === 1,
           'Recorder did not show the locally saved observation');
+        check(!recorderDoc.getElementById('copy-summary').disabled,
+          'Recorder evidence summary did not enable after saving');
+        check(recorderDoc.getElementById('evidence-summary').textContent.includes('1 saved session'),
+          'Recorder evidence summary did not count the saved session');
+        check(recorderDoc.getElementById('evidence-summary').textContent.includes('0 timed / 1 step'),
+          'Recorder evidence summary did not report matched Double Pass coverage');
         const saved = JSON.parse(recorder.contentWindow.localStorage.getItem(
           'lumen-relay-playtest-records-v1'));
         check(saved.length === 1 && saved[0].candidate === 'double-pass-step',
@@ -191,6 +197,10 @@
         recorderDoc.querySelector('#saved-list .saved-actions button:last-child').click();
         check(recorderDoc.querySelectorAll('#saved-list .saved-item').length === 0,
           'Recorder delete action did not remove observation');
+        check(recorderDoc.getElementById('copy-summary').disabled,
+          'Recorder evidence summary stayed enabled after deleting the last session');
+        check(recorderDoc.getElementById('evidence-summary').textContent.includes('No saved evidence yet'),
+          'Recorder evidence summary did not reset after deleting the last session');
         check(JSON.parse(recorder.contentWindow.localStorage.getItem(
           'lumen-relay-playtest-records-v1')).length === 0,
           'Recorder delete left persistent data behind');
