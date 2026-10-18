@@ -145,6 +145,19 @@
         rotate(doc, '7,5');
         rotate(doc, '7,2');
         await shoot(doc, 'win');
+        check(doc.getElementById('explore-after-win').hidden,
+          'Mode launcher link appeared before the final puzzle');
+
+        doc.getElementById('next').click();
+        check(doc.getElementById('level-title').textContent === 'The Long Bloom',
+          'Fourth puzzle did not load');
+        check(doc.getElementById('chapter').textContent.includes('04 / 04'),
+          'Fourth puzzle counter did not update');
+        rotate(doc, '2,4');
+        rotate(doc, '2,1');
+        rotate(doc, '6,1');
+        rotate(doc, '6,5');
+        await shoot(doc, 'win');
         check(doc.getElementById('next').textContent.includes('Play again'),
           'Completion replay control missing');
         const explore = doc.getElementById('explore-after-win');
