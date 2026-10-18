@@ -40,6 +40,13 @@ function syncControls() {
 function cellLabel(x, y, contents) {
   return contents + " at column " + (x + 1) + ", row " + (y + 1);
 }
+function mirrorOrientation(orientation) {
+  return orientation === "/" ? "slash" : "backslash";
+}
+function mirrorLabel(x, y, orientation) {
+  return cellLabel(x, y, "Rotatable mirror, " + mirrorOrientation(orientation) + " orientation") +
+    ". Activate to turn it.";
+}
 function renderBoard() {
   const level = currentLevel();
   const wallKeys = new Set(level.walls.map(({ x, y }) => positionKey(x, y)));
@@ -65,16 +72,16 @@ function renderBoard() {
         tile.type = "button";
         tile.classList.add("tile--mirror");
         tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
-        tile.setAttribute("aria-label", cellLabel(x, y, "Rotatable mirror") + ". Activate to turn it.");
+        tile.setAttribute("aria-label", mirrorLabel(x, y, state.mirrors[key]));
         tile.addEventListener("click", () => {
           if (state.playing || state.won) return;
           state.mirrors = rotateMirror(state.mirrors, x, y);
           state.turns += 1;
           tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
-          tile.setAttribute("aria-label", cellLabel(x, y, "Rotatable mirror") + ". Activate to turn it.");
+          tile.setAttribute("aria-label", mirrorLabel(x, y, state.mirrors[key]));
           clearGlow();
           displayCounters();
-          setStatus("Mirror turned. Send a pulse to test your new route.");
+          setStatus(cellLabel(x, y, "Mirror turned to " + mirrorOrientation(state.mirrors[key])) + ". Send a pulse to test the route.");
           chirp(500);
         });
       } else if (key === sourceKey) {
