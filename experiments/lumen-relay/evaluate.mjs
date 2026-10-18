@@ -1,5 +1,6 @@
 import { CANDIDATES, getCandidateFromSearch } from "./evaluate-candidates.mjs";
 import { summarizeEvidence, evidenceSummaryText } from "./evidence-summary.mjs";
+import { parseSavedRecords } from "./evaluate-storage.mjs";
 const STORAGE_KEY = "lumen-relay-playtest-records-v1";
 
 const FIELD_IDS = [
@@ -34,13 +35,21 @@ function clean(value) {
   return text || "not tested / not recorded";
 }
 
+function loadRecordState() {
+  try { return parseSavedRecords(localStorage.getItem(STORAGE_KEY)); }
+  catch { return { records: [], invalidCount: 0 }; }
+}
+
 function loadRecords() {
-  try {
-    const value = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-    return Array.isArray(value) ? value : [];
-  } catch {
-    return [];
-  }
+  return loadRecordState().records;
+}
+
+function invalidRecordNote(invalidCount) {
+  return invalidCount > 0
+    ? " " + invalidCount + " damaged or duplicate saved " +
+      (invalidCount === 1 ? "entry was" : "entries were") +
+      " skipped. Only recoverable records were kept."
+    : "";
 }
 
 function saveRecords(records) {
@@ -89,39 +98,42 @@ function currentRecord() {
 }
 
 function reportFor(record) {
+  const environment = record.environment ?? {};
+  const observations = record.observations ?? {};
+  const label = record.candidateLabel ?? CANDIDATES[record.candidate]?.label ?? "Unknown candidate";
   return [
     "**Lumen Relay playtest observation**",
     "",
-    `- Candidate: **${record.candidateLabel}**`,
-    `- Recorded: ${record.recordedAt}`,
-    `- Device class: ${record.environment.device}`,
-    `- Primary input: ${record.environment.input}`,
-    `- Viewport: ${record.environment.viewport}`,
-    `- Reduced motion: ${record.environment.reducedMotion}`,
-    `- Session result: ${record.result}`,
+    `- Candidate: **${label}**`,
+    `- Recorded: ${clean(record.recordedAt)}`,
+    `- Device class: ${clean(environment.device)}`,
+    `- Primary input: ${clean(environment.input)}`,
+    `- Viewport: ${clean(environment.viewport)}`,
+    `- Reduced motion: ${clean(environment.reducedMotion)}`,
+    `- Session result: ${clean(record.result)}`,
     "",
     "**Discoverability**",
-    record.observations.discoverability,
+    clean(observations.discoverability),
     "",
     "**Causal understanding**",
-    record.observations.causalUnderstanding,
+    clean(observations.causalUnderstanding),
     "",
     "**Meaningful movement**",
-    record.observations.meaningfulMovement,
+    clean(observations.meaningfulMovement),
     "",
     "**Fairness**",
-    record.observations.fairness,
+    clean(observations.fairness),
     "",
     "**Accessibility / control**",
-    record.observations.accessibility,
+    clean(observations.accessibility),
     "",
     "**Replay interest**",
-    record.observations.replayInterest,
+    clean(observations.replayInterest),
     "",
     "**Other observations**",
-    record.observations.other,
+    clean(observations.other),
     "",
-    `**Evidence direction:** ${record.evidenceDirection}`,
+    `**Evidence direction:** ${clean(record.evidenceDirection)}`,
     "",
     "_This is one observation session, not an automatic Continue / Mutate / Replace company verdict._"
   ].join("\n");
@@ -217,11 +229,13 @@ function renderRecords() {
     item.className = "saved-item";
 
     const heading = document.createElement("strong");
-    heading.textContent = record.candidateLabel;
+    heading.textContent = record.candidateLabel ?? CANDIDATES[record.candidate]?.label ?? "Unknown candidate";
 
     const meta = document.createElement("div");
     meta.className = "saved-meta";
-    meta.textContent = new Date(record.recordedAt).toLocaleString() + " · " + record.evidenceDirection;
+    const stamp = new Date(record.recordedAt);
+    meta.textContent = (Number.isNaN(stamp.getTime()) ? "Date not recorded" : stamp.toLocaleString()) +
+      " · " + clean(record.evidenceDirection);
 
     const actions = document.createElement("div");
     actions.className = "saved-actions";
@@ -238,13 +252,14 @@ function renderRecords() {
     remove.type = "button";
     remove.textContent = "Delete";
     remove.addEventListener("click", () => {
-      const saved = saveRecords(loadRecords().filter(entry => entry.id !== record.id));
+      const loaded = loadRecordState();
+      const saved = saveRecords(loaded.records.filter(entry => entry.id !== record.id));
       if (!saved) {
         setStatus("Local storage is unavailable; the saved session could not be deleted.");
         return;
       }
       renderRecords();
-      setStatus("Saved session deleted.");
+      setStatus("Saved session deleted." + invalidRecordNote(loaded.invalidCount));
     });
 
     actions.append(copy, remove);
@@ -261,14 +276,16 @@ elements.openCandidate.addEventListener("click", () => {
 });
 
 elements.saveSession.addEventListener("click", () => {
-  const records = loadRecords();
+  const loaded = loadRecordState();
+  const records = loaded.records;
   records.push(currentRecord());
   if (!saveRecords(records)) {
     setStatus("Local storage is unavailable. Your form is still intact; use Copy current Issue #8 report instead.");
     return;
   }
   renderRecords();
-  setStatus("Session saved locally. Nothing was uploaded.");
+  setStatus("Session saved locally. Nothing was uploaded." +
+    invalidRecordNote(loaded.invalidCount));
 });
 
 elements.copyCurrent.addEventListener("click", async () => {
@@ -307,3 +324,8 @@ elements.clearSaved.addEventListener("click", () => {
 });
 
 renderRecords();
+const initiallyDamaged = loadRecordState().invalidCount;
+if (initiallyDamaged > 0) {
+  setStatus("Recorder opened with some damaged saved evidence." +
+    invalidRecordNote(initiallyDamaged));
+}

@@ -169,3 +169,36 @@ test("saved observed sessions update the local evidence summary without choosing
   assert.match(els["evidence-summary"].textContent, /inconclusive: 1/);
   assert.doesNotMatch(els["evidence-summary"].textContent, /winner|recommended/i);
 });
+
+
+test("recorder keeps working when one saved record is partial and others are corrupt", async () => {
+  const partial = {
+    id: "legacy-observation",
+    candidate: "double-pass",
+    result: "attempted",
+    evidenceDirection: "inconclusive"
+  };
+  saved.set("lumen-relay-playtest-records-v1",
+    JSON.stringify([null, "corrupt", {}, partial, { ...partial }]));
+  els.candidate.value = "double-pass-step";
+  els.result.value = "not recorded";
+  await els["save-session"].click();
+
+  assert.match(els.status.textContent, /4 damaged or duplicate saved entries were skipped/i);
+  assert.equal(els["saved-list"].children.length, 2,
+    "one recoverable legacy session and the newly saved session remain");
+  assert.match(els["evidence-summary"].textContent, /2 saved sessions; 1 observed/);
+  const legacy = els["saved-list"].children[1];
+  assert.equal(legacy.children[0].textContent, "Double Pass");
+  assert.match(legacy.children[1].textContent, /Date not recorded/);
+  await legacy.children[2].children[0].click();
+  assert.match(els["manual-copy-text"].value, /Double Pass/);
+  assert.match(els["manual-copy-text"].value, /not tested \/ not recorded/);
+  assert.match(els["manual-copy-text"].value, /Session result: attempted/);
+  assert.doesNotMatch(els["manual-copy-text"].value, /undefined|\[object Object\]/);
+
+  // A later delete affects only the selected saved ID, not unrelated sessions.
+  await legacy.children[2].children[1].click();
+  assert.equal(els["saved-list"].children.length, 1);
+  assert.match(els.status.textContent, /Saved session deleted/);
+});
