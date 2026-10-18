@@ -1,6 +1,7 @@
 import { createMirrorState, positionKey, rotateMirror } from "../src/engine.mjs";
 import { advanceLivePulse, createLivePulse } from "./live-engine.mjs";
 import { LIVE_LEVEL } from "./live-level.mjs";
+import { createStepSession } from "./step-session.mjs";
 
 const byId = id => document.getElementById(id);
 const elements = {
@@ -15,9 +16,17 @@ const elements = {
 };
 
 const liveKeys = new Set(LIVE_LEVEL.liveMirrorKeys);
+const sessionEngine = Object.freeze({
+  initialPulse: createLivePulse,
+  stepPulse: (level, pulse, mirrors) => advanceLivePulse(level, mirrors, pulse)
+});
+let session = createStepSession(
+  LIVE_LEVEL,
+  sessionEngine,
+  createMirrorState(LIVE_LEVEL)
+);
+
 const state = {
-  mirrors: createMirrorState(LIVE_LEVEL),
-  pulse: createLivePulse(LIVE_LEVEL),
   begun: false,
   turns: 0
 };
@@ -34,22 +43,24 @@ function setStatus(message, kind = "ready") {
 }
 
 function updateCounters() {
-  elements.steps.textContent = String(state.pulse.steps);
+  elements.steps.textContent = String(session.snapshot.steps);
   elements.turns.textContent = String(state.turns);
 }
 
 function mirrorLabel(x, y, key, fixed = false) {
+  const snapshot = session.snapshot;
   const prefix = fixed ? "Fixed mirror" : "Live mirror";
   const action = fixed
     ? "This mirror cannot be turned."
-    : (state.begun && !state.pulse.outcome
+    : (state.begun && !snapshot.pulse.outcome
         ? "Activate to turn it before advancing again."
         : "Available after step mode begins.");
-  return prefix + ", " + orientationName(state.mirrors[key]) +
+  return prefix + ", " + orientationName(snapshot.mirrors[key]) +
     ", column " + (x + 1) + ", row " + (y + 1) + ". " + action;
 }
 
 function renderBoard() {
+  const snapshot = session.snapshot;
   const sourceKey = positionKey(LIVE_LEVEL.source.x, LIVE_LEVEL.source.y);
   const goalKey = positionKey(LIVE_LEVEL.goal.x, LIVE_LEVEL.goal.y);
   const fragment = document.createDocumentFragment();
@@ -64,7 +75,7 @@ function renderBoard() {
   for (let y = 0; y < LIVE_LEVEL.height; y += 1) {
     for (let x = 0; x < LIVE_LEVEL.width; x += 1) {
       const key = positionKey(x, y);
-      const isMirror = Object.hasOwn(state.mirrors, key);
+      const isMirror = Object.hasOwn(snapshot.mirrors, key);
       const isLive = liveKeys.has(key);
       const tile = document.createElement(isMirror && isLive ? "button" : "div");
       tile.className = "tile";
@@ -73,17 +84,21 @@ function renderBoard() {
       if (isMirror) {
         tile.classList.add("tile--mirror");
         if (!isLive) tile.classList.add("tile--fixed");
-        tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
+        tile.textContent = snapshot.mirrors[key] === "/" ? "╱" : "╲";
         tile.setAttribute("aria-label", mirrorLabel(x, y, key, !isLive));
 
         if (isLive) {
           tile.type = "button";
-          tile.disabled = !state.begun || Boolean(state.pulse.outcome);
+          tile.disabled = !state.begun || Boolean(snapshot.pulse.outcome);
           tile.addEventListener("click", () => {
-            if (!state.begun || state.pulse.outcome) return;
-            state.mirrors = rotateMirror(state.mirrors, x, y);
+            const current = session.snapshot;
+            if (!state.begun || current.pulse.outcome) return;
+
+            session.rotate(rotateMirror(current.mirrors, x, y));
             state.turns += 1;
-            tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
+
+            const next = session.snapshot;
+            tile.textContent = next.mirrors[key] === "/" ? "╱" : "╲";
             tile.setAttribute("aria-label", mirrorLabel(x, y, key));
             updateCounters();
             setStatus("Mirror changed. The next Advance action will use its new orientation.");
@@ -109,17 +124,19 @@ function renderBoard() {
 }
 
 function paintPulse() {
+  const pulse = session.snapshot.pulse;
   for (const tile of tiles.values()) tile.classList.remove("lit", "current");
-  for (const position of state.pulse.path) {
+  for (const position of pulse.path) {
     const tile = tiles.get(positionKey(position.x, position.y));
     if (tile) tile.classList.add("lit");
   }
-  const current = tiles.get(positionKey(state.pulse.x, state.pulse.y));
+  const current = tiles.get(positionKey(pulse.x, pulse.y));
   if (current) current.classList.add("current");
 }
 
 function syncControls() {
-  const finished = Boolean(state.pulse.outcome);
+  const snapshot = session.snapshot;
+  const finished = Boolean(snapshot.pulse.outcome);
   elements.begin.disabled = state.begun && !finished;
   elements.begin.textContent = finished ? "Begin new step run" : "Begin step mode";
   elements.advance.disabled = !state.begun || finished;
@@ -134,8 +151,7 @@ function syncControls() {
 }
 
 function reset() {
-  state.mirrors = createMirrorState(LIVE_LEVEL);
-  state.pulse = createLivePulse(LIVE_LEVEL);
+  session.reset(createMirrorState(LIVE_LEVEL));
   state.begun = false;
   state.turns = 0;
   renderBoard();
@@ -145,8 +161,7 @@ function reset() {
 }
 
 function begin() {
-  state.mirrors = createMirrorState(LIVE_LEVEL);
-  state.pulse = createLivePulse(LIVE_LEVEL);
+  session.reset(createMirrorState(LIVE_LEVEL));
   state.begun = true;
   state.turns = 0;
   renderBoard();
@@ -156,17 +171,19 @@ function begin() {
 }
 
 function advance() {
-  if (!state.begun || state.pulse.outcome) return;
-  state.pulse = advanceLivePulse(LIVE_LEVEL, state.mirrors, state.pulse);
+  const before = session.snapshot;
+  if (!state.begun || before.pulse.outcome) return;
+
+  const snapshot = session.advance();
   paintPulse();
   updateCounters();
 
-  if (state.pulse.outcome === "won") {
+  if (snapshot.pulse.outcome === "won") {
     setStatus("Relay complete with no reaction-time requirement. ✿", "win");
-  } else if (state.pulse.outcome) {
-    const outcome = state.pulse.outcome === "timeout"
+  } else if (snapshot.pulse.outcome) {
+    const outcome = snapshot.pulse.outcome === "timeout"
       ? "The pulse timed out."
-      : state.pulse.outcome === "blocked"
+      : snapshot.pulse.outcome === "blocked"
         ? "The pulse hit a blocker."
         : "The pulse escaped the board.";
     setStatus(outcome + " Begin a new run and try a different sequence.", "fail");
