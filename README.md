@@ -21,7 +21,7 @@ The prototype is intentionally reversible. The repository does **not** yet recor
 
 ## Play online
 
-GitHub Pages publishes the project at **[Play Lumen Relay](https://minuteandone.github.io/Game-company-singlegame/)**. The repository-root homepage links to the [five-mode launcher](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/modes.html), the original puzzle, and the local-only playtest recorder.
+GitHub Pages publishes the project at **[Play Lumen Relay](https://minuteandone.github.io/Game-company-singlegame/)**. The repository-root homepage links to the [five-mode launcher](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/modes.html), the original puzzle, and the local-only playtest recorder. The launcher now links to a [matched timed-vs-step playtest guide](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/playtest.html).
 
 The game runs as static HTML and browser ES modules; no account or backend is required. Site availability depends on the latest successful GitHub Pages deployment.
 
@@ -48,6 +48,7 @@ Or open a specific page:
 | Double Pass | `http://localhost:8000/spikes/double-pass.html` | Forced between-visits mirror change |
 | Relay Window · Step Mode | `http://localhost:8000/spikes/step-routing.html` | Player-paced Relay Window |
 | Double Pass · Step Mode | `http://localhost:8000/spikes/step-routing.html?level=double-pass` | Exact Double Pass rules without reaction-time pressure |
+| Matched playtest guide | `http://localhost:8000/playtest.html` | Alternated timed-first and step-first Double Pass comparison with links to individual observation forms |
 | Playtest recorder | `http://localhost:8000/evaluate.html` | Local-only structured observation capture for Issue #8 |
 
 A different local static-file server works too; the pages use browser ES modules, so opening the HTML directly from `file://` is not recommended.
@@ -75,7 +76,7 @@ Implementation correctness is tested, but correctness is not the same thing as f
 
 Use `http://localhost:8000/evaluate.html` to record a structured observation session locally and copy a ready-to-paste Issue #8 report. The recorder sends nothing automatically and preserves a visible/selectable report if clipboard access is blocked.
 
-For the cleanest pacing comparison, play **Double Pass** and **Double Pass · Step Mode**: they use the same puzzle geometry and route rules, with real-time versus player-paced advancement as the main variable.
+For the cleanest pacing comparison, use the [matched playtest guide](experiments/lumen-relay/playtest.html). It offers timed-first and step-first sequences of **Double Pass** and **Double Pass · Step Mode**, using the same puzzle geometry and route rules, with real-time versus player-paced advancement as the main variable. The recorder remains local-only.
 
 The current decision gate is documented in:
 
