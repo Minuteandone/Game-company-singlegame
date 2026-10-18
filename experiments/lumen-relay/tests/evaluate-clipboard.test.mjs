@@ -38,7 +38,7 @@ const fieldIds = [
 ];
 const otherIds = [
   "open-candidate", "save-session", "copy-current", "reset-form",
-  "clear-saved", "saved-list", "status",
+  "clear-saved", "copy-summary", "evidence-summary", "saved-list", "status",
   "manual-copy-panel", "manual-copy-text", "select-manual-copy"
 ];
 const els = Object.fromEntries([...fieldIds, ...otherIds]
@@ -140,6 +140,14 @@ test("copying a saved session uses saved evidence, not the newer form contents",
   assert.doesNotMatch(els["manual-copy-text"].value, /Form changed after saving/);
 });
 
+
+test("saved sessions update the local evidence summary without choosing a winner", async () => {
+  assert.equal(els["copy-summary"].disabled, false);
+  assert.match(els["evidence-summary"].textContent, /1 saved session/);
+  assert.match(els["evidence-summary"].textContent, /0 timed \/ 1 step/);
+  assert.match(els["evidence-summary"].textContent, /inconclusive: 1/);
+  assert.doesNotMatch(els["evidence-summary"].textContent, /winner|recommended/i);
+});
 
 test("the untouched recorder does not invent a completed playtest or device", async () => {
   const html = await readFile(new URL("../evaluate.html", import.meta.url), "utf8");
