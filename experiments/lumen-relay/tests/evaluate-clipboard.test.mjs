@@ -75,7 +75,7 @@ Object.defineProperty(globalThis, "navigator", {
   writable: true,
   value: { clipboard: { async writeText() { throw new Error("Permission denied"); } } }
 });
-globalThis.window = { open() {} };
+globalThis.window = { location: { search: "" }, open() {} };
 globalThis.confirm = () => false;
 
 await import("../evaluate.mjs");
