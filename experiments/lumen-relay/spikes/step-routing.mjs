@@ -1,6 +1,5 @@
 import { createMirrorState, positionKey, rotateMirror } from "../src/engine.mjs";
 import { advanceLivePulse, createLivePulse } from "./live-engine.mjs";
-import { LIVE_LEVEL } from "./live-level.mjs";
 import { DOUBLE_PASS_LEVEL } from "./double-pass-level.mjs";
 import { selectStepLevel } from "./step-level-choice.mjs";
 import { createStepSession } from "./step-session.mjs";
@@ -14,7 +13,8 @@ const elements = {
   hint: byId("hint"),
   status: byId("status"),
   steps: byId("steps"),
-  turns: byId("turns")
+  turns: byId("turns"),
+  passes: byId("passes")
 };
 
 const ACTIVE_LEVEL = selectStepLevel(window.location.search);
