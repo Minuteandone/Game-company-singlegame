@@ -13,6 +13,7 @@
   <iframe id="mobile" title="375px baseline mobile layout" src="../index.html" width="375" height="760"></iframe>
   <iframe id="mobile-step" title="375px step mode mobile layout" src="../spikes/step-routing.html?level=double-pass" width="375" height="760"></iframe>
   <iframe id="entry" title="Pages root game entry under test" src="../../../index.html" width="900" height="700"></iframe>
+  <iframe id="comparison" title="Matched comparison guide under test" src="../compare.html" width="1050" height="800"></iframe>
   <script>
     // Same-origin iframe exercises the actual browser UI without app-specific hooks.
     const report = document.getElementById('smoke-report');
@@ -25,6 +26,7 @@
     const recorder = document.getElementById('recorder');
     const live = document.getElementById('live');
     const doubleLive = document.getElementById('double-live');
+    const comparison = document.getElementById('comparison');
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     let checks = 0;
     function check(condition, message) {
@@ -296,6 +298,18 @@
 
         mobileBoardCheck(mobile, '3,3');
         mobileBoardCheck(mobileStep, '4,3');
+
+        const comparisonDoc = comparison.contentDocument;
+        check(comparisonDoc.title.includes('Matched Comparison Guide'),
+          'Matched comparison guide did not load');
+        check(comparisonDoc.querySelectorAll('[data-comparison-order]').length === 2,
+          'Matched comparison guide must expose both counterbalanced orders');
+        check(Boolean(comparisonDoc.querySelector('[data-comparison-order="timed-first"] a[href="./spikes/double-pass.html"]')),
+          'Timed-first sequence is missing timed Double Pass');
+        check(Boolean(comparisonDoc.querySelector('[data-comparison-order="step-first"] a[href="./spikes/step-routing.html?level=double-pass"]')),
+          'Step-first sequence is missing Step Double Pass');
+        check(Boolean(comparisonDoc.querySelector('a[href="./evaluate.html?candidate=baseline"]')),
+          'Comparison guide is missing baseline recorder preselection');
 
         const entryDoc = entry.contentDocument;
         check(Boolean(entryDoc.querySelector('main#game-entry')),
