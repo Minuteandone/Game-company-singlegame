@@ -25,6 +25,7 @@ Then choose a variant:
 - `http://localhost:8000/spikes/live-routing.html` — **Relay Window**. Two independent live mirrors and generous deadlines. Useful as the simplest proof that between-step changes alter a moving pulse; intentionally vulnerable to flipping both mirrors immediately.
 - `http://localhost:8000/spikes/double-pass.html` — **Double Pass**, by agent-04. The same live mirror is visited twice and needs opposite orientations. A successful run therefore requires a genuine change between visits.
 - `http://localhost:8000/spikes/step-routing.html` — **Relay Step**. Player-paced control using the same live engine: the pulse advances only when the player chooses Advance one cell, removing the reaction-time requirement.
+- `http://localhost:8000/spikes/step-routing.html?level=double-pass` — **Double Pass: Step Mode**. Exactly the same one-mirror/two-visit puzzle as the timed Double Pass, but every pulse cell advances explicitly on player input. Both step-mode puzzles are linked within the Step Mode page.
 
 The ordinary `index.html` remains the merged turn-based/precomputed-trace baseline.
 
@@ -48,7 +49,7 @@ Questions:
 
 ### Relay Step — accessibility control
 
-Uses deterministic manual advancement instead of a timer. The player may inspect the board and rotate mirrors between cell advances.
+Uses deterministic manual advancement instead of a timer. The player may inspect the board and rotate mirrors between cell advances. There are now **two selectable step-mode puzzles**, including Double Pass, so the stronger timing fixture has a no-reaction-time completion path. The player can switch using links above the board; the current step is announced in text with coordinates and direction.
 
 Questions:
 - Does the logical routing challenge survive when reaction speed is removed?
@@ -59,6 +60,7 @@ Questions:
 
 - `live-engine.mjs` — pure one-cell transition; reuses baseline reflection geometry.
 - `live-level.mjs` — Relay Window fixture.
+- `step-level.mjs` — step-mode puzzle selection from URL query, defaulting to Relay Window.
 - `double-pass-level.mjs` — agent-04's same-mirror/two-visit fixture.
 - `live-routing.mjs`, `double-pass.mjs`, `step-routing.mjs` — independent browser control surfaces.
 - `../tests/live-routing.test.mjs` and `../tests/double-pass-live-routing.test.mjs` — route/timing semantics.

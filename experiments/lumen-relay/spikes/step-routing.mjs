@@ -1,6 +1,7 @@
 import { createMirrorState, positionKey, rotateMirror } from "../src/engine.mjs";
 import { advanceLivePulse, createLivePulse } from "./live-engine.mjs";
-import { LIVE_LEVEL } from "./live-level.mjs";
+import { selectStepLevel } from "./step-level.mjs";
+const LIVE_LEVEL = selectStepLevel(window.location.search);
 import { createStepSession } from "./step-session.mjs";
 
 const byId = id => document.getElementById(id);
@@ -12,7 +13,9 @@ const elements = {
   hint: byId("hint"),
   status: byId("status"),
   steps: byId("steps"),
-  turns: byId("turns")
+  turns: byId("turns"),
+  levelTitle: byId("level-title"),
+  levelSubtitle: byId("level-subtitle")
 };
 
 const liveKeys = new Set(LIVE_LEVEL.liveMirrorKeys);
@@ -32,6 +35,14 @@ const state = {
 };
 
 let tiles = new Map();
+const headingNames = { N: "north", E: "east", S: "south", W: "west" };
+
+elements.levelTitle.textContent = LIVE_LEVEL.name;
+elements.levelSubtitle.textContent = LIVE_LEVEL.subtitle;
+document.title = "Lumen Relay — " + LIVE_LEVEL.name + " Step Mode";
+for (const link of document.querySelectorAll("[data-step-level]")) {
+  if (link.dataset.stepLevel === LIVE_LEVEL.id) link.setAttribute("aria-current", "page");
+}
 
 function orientationName(orientation) {
   return orientation === "/" ? "slash orientation" : "backslash orientation";
@@ -83,7 +94,7 @@ function renderBoard() {
 
       if (isMirror) {
         tile.classList.add("tile--mirror");
-        if (!isLive) tile.classList.add("tile--fixed");
+        tile.classList.add(isLive ? "tile--live" : "tile--fixed");
         tile.textContent = snapshot.mirrors[key] === "/" ? "╱" : "╲";
         tile.setAttribute("aria-label", mirrorLabel(x, y, key, !isLive));
 
@@ -188,7 +199,13 @@ function advance() {
         : "The pulse escaped the board.";
     setStatus(outcome + " Begin a new run and try a different sequence.", "fail");
   } else {
-    setStatus("Pulse advanced one cell. Inspect the route, rotate if needed, then advance again.");
+    const { x, y, dir } = snapshot.pulse;
+    setStatus(
+      "Pulse at column " + (x + 1) + ", row " + (y + 1) +
+      ", heading " + headingNames[dir] + "." +
+      (liveKeys.has(positionKey(x, y)) ? " This cell has a live mirror." : "") +
+      " Rotate a mirror or advance one cell."
+    );
   }
 
   syncControls();
