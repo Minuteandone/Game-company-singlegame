@@ -1,4 +1,4 @@
-// Three small hand-authored test puzzles. Positions use zero-based grid coordinates.
+// Four small hand-authored test puzzles. Positions use zero-based grid coordinates.
 // This file intentionally contains only data, so collaborators can add levels safely.
 export const LEVELS = [
   {
@@ -47,5 +47,23 @@ export const LEVELS = [
     ],
     walls: [{ x: 1, y: 4 }, { x: 4, y: 0 }, { x: 5, y: 3 }],
     hint: "Sometimes the best route starts by going down."
+  },
+  {
+    id: "the-long-bloom",
+    name: "The Long Bloom",
+    subtitle: "Five mirrors guide one signal. Only one is already aligned.",
+    width: 9,
+    height: 7,
+    source: { x: 0, y: 4, dir: "E" },
+    goal: { x: 8, y: 2 },
+    mirrors: [
+      { x: 2, y: 4, orientation: "\\" },
+      { x: 2, y: 1, orientation: "\\" },
+      { x: 6, y: 1, orientation: "/" },
+      { x: 6, y: 5, orientation: "/" },
+      { x: 8, y: 5, orientation: "/" }
+    ],
+    walls: [{ x: 1, y: 1 }, { x: 4, y: 3 }, { x: 7, y: 3 }],
+    hint: "Trace the whole winding route before turning. The last mirror already points the right way."
   }
 ];
