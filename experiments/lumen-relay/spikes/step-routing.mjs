@@ -244,6 +244,7 @@ function configureMode() {
   byId("mode-switch").href = "./step-routing.html";
   byId("live-counterpart").textContent = "Try real-time Double Pass";
   byId("live-counterpart").href = "./double-pass.html";
+  byId("live-counterpart").setAttribute("aria-label", "Play real-time Double Pass");
   elements.board.setAttribute("aria-label", "Player-paced Double Pass routing board");
   byId("passes-wrap").hidden = false;
 }
