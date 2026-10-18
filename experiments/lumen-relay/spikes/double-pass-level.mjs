@@ -8,14 +8,14 @@ export const DOUBLE_PASS_LEVEL = {
   goal: { x: 0, y: 3 },
   mirrors: [
     // This is the only live mirror. It must be "/" on the first arrival
-    // and "\" on the second arrival.
+    // and "\\" on the second arrival.
     { x: 4, y: 3, orientation: "/" },
 
     // Fixed relay loop.
     { x: 4, y: 1, orientation: "/" },
-    { x: 6, y: 1, orientation: "\" },
+    { x: 6, y: 1, orientation: "\\" },
     { x: 6, y: 4, orientation: "/" },
-    { x: 4, y: 4, orientation: "\" }
+    { x: 4, y: 4, orientation: "\\" }
   ],
   walls: [],
   maxLiveSteps: 48,
