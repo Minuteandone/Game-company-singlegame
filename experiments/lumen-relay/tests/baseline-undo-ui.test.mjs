@@ -33,6 +33,7 @@ class FakeElement {
   }
   setAttribute(name, value) { this.attributes.set(name, String(value)); }
   getAttribute(name) { return this.attributes.get(name) ?? null; }
+  focus() { globalThis.document.activeElement = this; }
   addEventListener(event, handler) {
     this.listeners.set(event, [...(this.listeners.get(event) ?? []), handler]);
   }
@@ -59,6 +60,7 @@ globalThis.window = {
   webkitAudioContext: undefined
 };
 globalThis.document = {
+  activeElement: null,
   getElementById(id) { return els[id] ?? null; },
   createElement(name) { return new FakeElement(name); },
   createDocumentFragment() { return new FakeElement("fragment"); },
@@ -123,6 +125,8 @@ test("win locks undo and the next level starts with empty history", async () => 
   assert.equal(els.next.hidden, false);
   await els.next.click();
   assert.equal(els["level-title"].textContent, "The Detour");
+  assert.equal(document.activeElement, els["level-title"],
+    "Next puzzle should focus its heading after hiding the Next button");
   assert.equal(els.turns.textContent, "0");
   assert.equal(els.undo.disabled, true);
   await mirror("3,5").click();
@@ -132,4 +136,50 @@ test("win locks undo and the next level starts with empty history", async () => 
   assert.equal(els.turns.textContent, "1");
   assert.match(mirror("6,1").getAttribute("aria-label"), /slash orientation/);
   assert.match(mirror("3,5").getAttribute("aria-label"), /slash orientation/);
+});
+
+
+test("focused Undo button returns focus to the restored mirror", async () => {
+  await els.reset.click();
+  await mirror("3,5").click();
+  const changedMirror = mirror("3,5");
+  els.undo.focus();
+  assert.strictEqual(document.activeElement, els.undo);
+  await els.undo.click();
+  assert.strictEqual(document.activeElement, changedMirror);
+  assert.equal(els.undo.disabled, true);
+  assert.match(changedMirror.getAttribute("aria-label"), /backslash orientation/);
+});
+
+test("U shortcut preserves focus on an unrelated control", async () => {
+  await mirror("3,5").click();
+  els.hint.focus();
+  const keydown = documentListeners.get("keydown");
+  keydown({ key: "u", altKey: false, ctrlKey: false, metaKey: false, repeat: false });
+  assert.strictEqual(document.activeElement, els.hint);
+  assert.equal(els.turns.textContent, "0");
+});
+
+test("completing all three puzzles and replaying returns focus to First Light", async () => {
+  await els.reset.click();
+  await mirror("3,5").click();
+  await mirror("6,1").click();
+  await els.fire.click();
+  assert.equal(els.status.dataset.state, "win");
+  await els.next.click();
+  assert.equal(els["level-title"].textContent, "Crossed Wires");
+  assert.strictEqual(document.activeElement, els["level-title"]);
+  for (const key of ["2,1", "7,5", "7,2"]) await mirror(key).click();
+  await els.fire.click();
+  assert.equal(els.status.dataset.state, "win");
+  await els.next.click();
+  assert.equal(els["level-title"].textContent, "First Light");
+  assert.strictEqual(document.activeElement, els["level-title"]);
+  assert.equal(els.undo.disabled, true);
+  assert.equal(els.explore.hidden, true);
+});
+
+test("level heading can be focused programmatically without entering normal Tab order", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  assert.match(html, /<h2 id="level-title" tabindex="-1">/);
 });
