@@ -40,6 +40,11 @@ const headingNames = { N: "north", E: "east", S: "south", W: "west" };
 elements.levelTitle.textContent = LIVE_LEVEL.name;
 elements.levelSubtitle.textContent = LIVE_LEVEL.subtitle;
 document.title = "Lumen Relay — " + LIVE_LEVEL.name + " Step Mode";
+if (LIVE_LEVEL.id === "double-pass") {
+  const counterpart = byId("timed-variant");
+  counterpart.setAttribute("href", "./double-pass.html");
+  counterpart.setAttribute("aria-label", "Play the real-time Double Pass comparison");
+}
 for (const link of document.querySelectorAll("[data-step-level]")) {
   if (link.dataset.stepLevel === LIVE_LEVEL.id) link.setAttribute("aria-current", "page");
 }
@@ -200,12 +205,21 @@ function advance() {
     setStatus(outcome + " Begin a new run and try a different sequence.", "fail");
   } else {
     const { x, y, dir } = snapshot.pulse;
-    setStatus(
-      "Pulse at column " + (x + 1) + ", row " + (y + 1) +
-      ", heading " + headingNames[dir] + "." +
-      (liveKeys.has(positionKey(x, y)) ? " This cell has a live mirror." : "") +
-      " Rotate a mirror or advance one cell."
-    );
+    const onLiveMirror = liveKeys.has(positionKey(x, y));
+    const firstDoublePassVisit = LIVE_LEVEL.id === "double-pass" &&
+      onLiveMirror &&
+      !before.pulse.path.some(({ x: pastX, y: pastY }) =>
+        liveKeys.has(positionKey(pastX, pastY)));
+    const position = "Pulse at column " + (x + 1) + ", row " + (y + 1) +
+      ", heading " + headingNames[dir] + ".";
+
+    setStatus(firstDoublePassVisit
+      ? "First pass complete! " + position +
+        " Change the gold mirror before the light returns for its second visit."
+      : position +
+        (onLiveMirror ? " This cell has a live mirror." : "") +
+        " Rotate a mirror or advance one cell.");
+
   }
 
   syncControls();
