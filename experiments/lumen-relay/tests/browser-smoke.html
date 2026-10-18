@@ -196,10 +196,10 @@
           'Recorder did not show the locally saved observation');
         check(!recorderDoc.getElementById('copy-summary').disabled,
           'Recorder evidence summary did not enable after saving');
-        check(recorderDoc.getElementById('evidence-summary').textContent.includes('1 saved session'),
-          'Recorder evidence summary did not count the saved session');
-        check(recorderDoc.getElementById('evidence-summary').textContent.includes('0 timed / 1 step'),
-          'Recorder evidence summary did not report matched Double Pass coverage');
+        check(recorderDoc.getElementById('evidence-summary').textContent.includes('1 saved session; 0 observed'),
+          'Recorder evidence summary treated a neutral saved record as observed');
+        check(recorderDoc.getElementById('evidence-summary').textContent.includes('0 timed / 0 step'),
+          'Recorder neutral placeholder incorrectly counted as matched Double Pass coverage');
         const saved = JSON.parse(recorder.contentWindow.localStorage.getItem(
           'lumen-relay-playtest-records-v1'));
         check(saved.length === 1 && saved[0].candidate === 'double-pass-step',
