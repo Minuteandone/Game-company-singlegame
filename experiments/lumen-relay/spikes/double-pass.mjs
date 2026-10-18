@@ -75,8 +75,12 @@ function renderBoard() {
 
       if (isMirror) {
         tile.classList.add("tile--mirror");
-        if (isLive) tile.classList.add("tile--live");
-        else tile.classList.add("tile--fixed");
+        if (isLive) {
+          tile.classList.add("tile--live");
+        } else {
+          tile.classList.add("tile--fixed");
+          tile.setAttribute("role", "img");
+        }
 
         tile.textContent = state.mirrors[key] === "/" ? "╱" : "╲";
         tile.setAttribute("aria-label", mirrorLabel(x, y, key, !isLive));
@@ -97,10 +101,12 @@ function renderBoard() {
       } else if (key === sourceKey) {
         tile.classList.add("tile--source");
         tile.textContent = "◉";
+        tile.setAttribute("role", "img");
         tile.setAttribute("aria-label", "Pulse sender");
       } else if (key === goalKey) {
         tile.classList.add("tile--goal");
         tile.textContent = "✿";
+        tile.setAttribute("role", "img");
         tile.setAttribute("aria-label", "Sleeping flower");
       }
 
