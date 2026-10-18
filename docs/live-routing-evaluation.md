@@ -17,6 +17,8 @@ The live variants share the same one-cell routing engine and baseline reflection
 
 ## Test plan
 
+When serving `experiments/lumen-relay/` locally, open `evaluate.html` for a local-only observation recorder aligned to this protocol. It can open each candidate, save sessions in browser local storage, and copy a structured Issue #8 report. It does not upload anything or choose a verdict automatically.
+
 For each candidate, use the same device, input method, and a fresh play session. Do not explain the solution in advance.
 
 1. **Discoverability:** Can a player find the relevant mirror and launch/advance control without prompting?
@@ -86,5 +88,7 @@ Summarize actual observations in Issue #8. Include:
 - notable failure/retry behavior;
 - accessibility/control observations;
 - whether the evidence favors Continue, Mutate, Replace, or remains inconclusive.
+
+The local recorder formats these fields into a ready-to-paste Issue #8 comment, but the tester still decides whether to share it.
 
 Do not convert automated correctness results into a gameplay verdict. The experiments are consolidated for comparison, not promoted into the baseline by default.
