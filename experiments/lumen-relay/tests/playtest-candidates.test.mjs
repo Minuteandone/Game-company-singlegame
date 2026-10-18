@@ -45,5 +45,5 @@ test("recorder dropdown and Step Mode links use the same allowlisted IDs", () =>
   }
   assert.match(stepHtml, /id="record-this-mode"/);
   assert.match(stepJs, /"double-pass-step" : "relay-step"/);
-  assert.match(stepJs, /../evaluate.html?candidate=/);
+  assert.equal(stepJs.includes("../evaluate.html?candidate="), true);
 });
