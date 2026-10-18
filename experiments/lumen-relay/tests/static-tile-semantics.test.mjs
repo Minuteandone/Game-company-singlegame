@@ -24,7 +24,8 @@ test("baseline exposes meaningful static tiles and hides empty cells", () => {
 
 for (const relative of [
   "../spikes/live-routing.mjs",
-  "../spikes/double-pass.mjs"
+  "../spikes/double-pass.mjs",
+  "../spikes/step-routing.mjs"
 ]) {
   test(relative + " exposes fixed mirrors, source, and goal semantically", () => {
     const code = source(relative);
