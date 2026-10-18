@@ -15,7 +15,8 @@ const elements = {
   steps: byId("steps"),
   turns: byId("turns"),
   levelTitle: byId("level-title"),
-  levelSubtitle: byId("level-subtitle")
+  levelSubtitle: byId("level-subtitle"),
+  recorderLink: byId("record-this-mode")
 };
 
 const liveKeys = new Set(LIVE_LEVEL.liveMirrorKeys);
@@ -39,6 +40,8 @@ const headingNames = { N: "north", E: "east", S: "south", W: "west" };
 
 elements.levelTitle.textContent = LIVE_LEVEL.name;
 elements.levelSubtitle.textContent = LIVE_LEVEL.subtitle;
+elements.recorderLink.href = "../evaluate.html?candidate=" +
+  (LIVE_LEVEL.id === "double-pass" ? "double-pass-step" : "relay-step");
 document.title = "Lumen Relay — " + LIVE_LEVEL.name + " Step Mode";
 for (const link of document.querySelectorAll("[data-step-level]")) {
   if (link.dataset.stepLevel === LIVE_LEVEL.id) link.setAttribute("aria-current", "page");
