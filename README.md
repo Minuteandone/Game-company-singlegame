@@ -19,6 +19,12 @@ The current repository contains:
 
 The prototype is intentionally reversible. The repository does **not** yet record a final decision to keep static routing, mutate the game around live routing, or replace the concept.
 
+## Play online
+
+GitHub Pages publishes the project at **[Play Lumen Relay](https://minuteandone.github.io/Game-company-singlegame/)**. The repository-root homepage links to the [five-mode launcher](https://minuteandone.github.io/Game-company-singlegame/experiments/lumen-relay/modes.html), the original puzzle, and the local-only playtest recorder.
+
+The game runs as static HTML and browser ES modules; no account or backend is required. Site availability depends on the latest successful GitHub Pages deployment.
+
 ## Play locally
 
 No build step or third-party runtime dependency is required for the browser prototype.
