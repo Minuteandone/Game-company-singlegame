@@ -11,7 +11,8 @@ All candidates now live under the merged Lumen Relay experiment rather than sepa
 - **Baseline** — `experiments/lumen-relay/index.html`: mirrors change before launch; animation replays a precomputed trace.
 - **Relay Window** — `experiments/lumen-relay/spikes/live-routing.html`: two mirrors can change while the pulse moves, but both may be corrected immediately after launch.
 - **Double Pass** — `experiments/lumen-relay/spikes/double-pass.html`: the same live mirror is visited twice and requires opposite orientations, forcing a state change between visits.
-- **Relay Step** — `experiments/lumen-relay/spikes/step-routing.html`: player-paced live routing using an Advance-one-cell control, removing the reaction-time requirement.
+- **Relay Window · Step Mode** — `experiments/lumen-relay/spikes/step-routing.html`: player-paced Relay Window using an Advance-one-cell control.
+- **Double Pass · Step Mode** — `experiments/lumen-relay/spikes/step-routing.html?level=double-pass`: the exact Double Pass geometry and solution rules, but every pulse cell advances explicitly on player input.
 
 The live variants share the same one-cell routing engine and baseline reflection geometry. Automated tests establish deterministic behavior; they do not establish fun, clarity, comfort, or preference.
 
@@ -50,13 +51,16 @@ Try:
 
 Record whether the repeated visit is legible before reading the hint, and whether the successful timing window feels like anticipation rather than a reaction-speed test.
 
-### Relay Step
+### Step Mode
 
-Solve the live-routing logic using explicit Advance actions. Compare it with real-time routing:
-- Does the logical puzzle remain interesting without a timer?
-- Is cause-and-effect easier to understand?
+Solve the live-routing logic using explicit Advance actions. Compare Relay Window with its step-mode version, then compare timed Double Pass directly against **Double Pass · Step Mode**.
+
+For the Double Pass pair, keep the geometry and solution constant and change only pacing:
+- Is the repeated-mirror rule understandable in both modes?
+- Does real-time timing add anticipation, or mostly input pressure?
+- Does player-paced stepping make cause-and-effect clearer?
 - Does manual stepping feel empowering, tedious, or preferable?
-- Would this work as an equivalent accessibility/control option rather than a separate difficulty mode?
+- Would step mode work as an equivalent accessibility/control option rather than a separate difficulty mode?
 
 ## Input and display checks
 
