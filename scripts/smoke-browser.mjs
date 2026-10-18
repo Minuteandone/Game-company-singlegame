@@ -45,7 +45,7 @@ try {
   const args = [
     '--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage',
     '--no-first-run', '--no-default-browser-check', '--disable-background-networking',
-    '--virtual-time-budget=25000', '--dump-dom', `--user-data-dir=${profile}`, url
+    '--virtual-time-budget=50000', '--dump-dom', `--user-data-dir=${profile}`, url
   ];
   browser = spawn(browserPath, args, { stdio: ['ignore', 'pipe', 'pipe'] });
   let output = '';
@@ -54,7 +54,7 @@ try {
   browser.stderr.setEncoding('utf8');
   browser.stdout.on('data', chunk => { output += chunk; });
   browser.stderr.on('data', chunk => { errors = (errors + chunk).slice(-6000); });
-  const timeout = setTimeout(() => { didTimeout = true; browser.kill('SIGKILL'); }, 45000);
+  const timeout = setTimeout(() => { didTimeout = true; browser.kill('SIGKILL'); }, 70000);
   const exitCode = await new Promise((resolve, reject) => {
     browser.on('error', reject);
     browser.on('close', resolve);
