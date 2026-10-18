@@ -1,17 +1,24 @@
 /**
  * Timer-free controller for a one-cell pulse engine.
- * Accepts both the baseline-style "moving" outcome and the live engine's null
- * outcome as active states; all other outcomes are terminal.
+ * The default activity convention accepts null/undefined or "moving" outcomes.
+ * Engines using other conventions may supply isActive(pulse).
  *
  * Engine contract:
  *   initialPulse(level) -> pulse
  *   stepPulse(level, pulse, mirrorState) -> nextPulse
+ *   isActive(pulse) -> boolean (optional)
  */
-export function createStepSession(level, { initialPulse, stepPulse }, initialMirrors) {
+export function createStepSession(
+  level,
+  { initialPulse, stepPulse, isActive = pulse => pulse.outcome == null || pulse.outcome === "moving" },
+  initialMirrors
+) {
   if (typeof initialPulse !== "function" || typeof stepPulse !== "function") {
     throw new TypeError("A pulse engine with initialPulse and stepPulse is required");
   }
-  const inFlight = pulse => pulse.outcome == null || pulse.outcome === "moving";
+  if (typeof isActive !== "function") {
+    throw new TypeError("isActive must be a function");
+  }
   let pulse = initialPulse(level);
   let mirrors = initialMirrors;
   let steps = 0;
@@ -21,12 +28,12 @@ export function createStepSession(level, { initialPulse, stepPulse }, initialMir
       return { pulse: { ...pulse }, mirrors, steps, generation };
     },
     rotate(nextMirrors) {
-      if (!inFlight(pulse)) return this.snapshot;
+      if (!isActive(pulse)) return this.snapshot;
       mirrors = nextMirrors;
       return this.snapshot;
     },
     advance() {
-      if (!inFlight(pulse)) return this.snapshot;
+      if (!isActive(pulse)) return this.snapshot;
       pulse = stepPulse(level, pulse, mirrors);
       steps++;
       return this.snapshot;
