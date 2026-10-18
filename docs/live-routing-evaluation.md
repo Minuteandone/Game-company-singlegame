@@ -60,6 +60,8 @@ For the Double Pass pair, keep the geometry and solution constant and change onl
 - Use **Sequence A** for some testers: timed Double Pass → Double Pass Step.
 - Use **Sequence B** for others: Double Pass Step → timed Double Pass.
 
+In **Other observations** of both recorder entries, use a shared non-identifying pair label (for example `Pair 01`) and write **Sequence A (timed first)** or **Sequence B (step first)**. This preserves the order when reviewing copied reports without collecting participant identity.
+
 Then ask:
 - Is the repeated-mirror rule understandable in both modes?
 - Does real-time timing add anticipation, or mostly input pressure?
