@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101e28">
+  <title>Lumen Relay — Live Routing Spike</title>
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    .spike-note{max-width:760px;color:#b8c9cb;line-height:1.65;margin:0 0 26px}
+    .spike-badge{display:inline-block;border:1px solid #6bc1aa66;border-radius:999px;padding:6px 10px;margin-bottom:12px;color:#70dbc0;font-size:11px;font-weight:800;letter-spacing:.12em}
+    .tile--fixed{opacity:.72}
+    .tile--mirror[disabled]{cursor:not-allowed}
+    .deadline{color:#ffd48d}
+  </style>
+  <script type="module" src="./live-routing.mjs"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="../index.html" aria-label="Back to baseline Lumen Relay"><span class="brand-mark">✳</span> LUMEN LAB</a>
+      <span class="prototype-tag">AGENT-03 LIVE-ROUTING SPIKE</span>
+    </header>
+
+    <main>
+      <div class="intro">
+        <div class="spike-badge">DISPOSABLE MECHANIC TEST</div>
+        <h1>Relay <span>Window.</span></h1>
+        <p class="spike-note">This variant asks one question: does the moving pulse become more interesting when mirror changes happen <em>during</em> travel? Mirrors are locked before launch. Once the pulse moves, turn the two highlighted mirrors before their deadlines.</p>
+      </div>
+
+      <section class="game-card" aria-label="Live-routing timing experiment">
+        <div class="game-head">
+          <div>
+            <p class="chapter">LIVE TEST 01</p>
+            <h2 id="level-title">Relay Window</h2>
+            <p class="level-subtitle">Two generous mid-flight decisions. Miss one and the pulse escapes.</p>
+          </div>
+          <div class="counter-stack" aria-label="Live pulse statistics">
+            <span>STEP <strong id="steps">0</strong></span>
+            <span>TURNS <strong id="turns">0</strong></span>
+          </div>
+        </div>
+
+        <div class="board-frame">
+          <div id="board" class="board" role="group" aria-label="Live routing puzzle board"></div>
+        </div>
+
+        <div class="legend" aria-label="Board key">
+          <span><b class="symbol symbol-source">◉</b> Sender</span>
+          <span><b class="symbol symbol-mirror">╱</b> <span class="deadline">Live mirror</span></span>
+          <span><b class="symbol symbol-mirror">╱</b> Fixed mirror</span>
+          <span><b class="symbol symbol-goal">✿</b> Flower</span>
+        </div>
+
+        <div class="action-row">
+          <button id="launch" class="primary" type="button">➜ Launch pulse</button>
+          <button id="reset" class="secondary" type="button">↺ Reset</button>
+          <button id="hint" class="secondary" type="button">Hint</button>
+        </div>
+        <p id="status" class="status" role="status" aria-live="polite" data-state="ready">Mirrors are locked until launch. Start the pulse, then react.</p>
+      </section>
+    </main>
+
+    <footer>SPIKE BY <strong>agent-03 (AI agent)</strong> <span>✦</span> BASELINE IMPLEMENTATION BY <strong>agent-02 (AI)</strong></footer>
+  </div>
+</body>
+</html>
