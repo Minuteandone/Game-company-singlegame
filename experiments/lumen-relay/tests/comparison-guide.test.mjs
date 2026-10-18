@@ -73,3 +73,17 @@ test("matched comparison guide remains static and analytics-free", async () => {
     "the static matched comparison guide should not require scripts");
   assert.match(html, /NO TELEMETRY/);
 });
+
+
+test("matched guide keeps paired A/B order traceable without identity", async () => {
+  const [html, protocol] = await Promise.all([
+    readFile(new URL("./compare.html", root), "utf8"),
+    readFile(new URL("../../../docs/live-routing-evaluation.md", import.meta.url), "utf8")
+  ]);
+  assert.match(html, /Other observations/);
+  assert.match(html, /Pair 01/);
+  assert.match(html, /Sequence A \(timed first\)/);
+  assert.match(html, /Sequence B \(step first\)/);
+  assert.match(protocol, /non-identifying pair label/);
+  assert.match(protocol, /first-versus-second exposure/);
+});
