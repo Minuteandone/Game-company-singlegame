@@ -36,3 +36,16 @@ for (const relative of [
     );
   });
 }
+
+
+for (const relative of [
+  "../spikes/live-routing.mjs",
+  "../spikes/double-pass.mjs",
+  "../spikes/step-routing.mjs"
+]) {
+  test(relative + " includes coordinates in static landmark labels", () => {
+    const code = source(relative);
+    assert.match(code, /Pulse sender, column/);
+    assert.match(code, /Sleeping flower, column/);
+  });
+}

@@ -125,12 +125,14 @@ function renderBoard() {
         tile.classList.add("tile--source");
         tile.textContent = "◉";
         tile.setAttribute("role", "img");
-        tile.setAttribute("aria-label", "Pulse sender");
+        tile.setAttribute("aria-label",
+          "Pulse sender, column " + (x + 1) + ", row " + (y + 1));
       } else if (key === goalKey) {
         tile.classList.add("tile--goal");
         tile.textContent = "✿";
         tile.setAttribute("role", "img");
-        tile.setAttribute("aria-label", "Sleeping flower");
+        tile.setAttribute("aria-label",
+          "Sleeping flower, column " + (x + 1) + ", row " + (y + 1));
       } else {
         tile.setAttribute("aria-hidden", "true");
       }
