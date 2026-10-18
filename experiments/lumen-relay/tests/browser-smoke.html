@@ -10,6 +10,8 @@
   <iframe id="recorder" title="Local playtest recorder under test" src="../evaluate.html" width="1050" height="800"></iframe>
   <iframe id="live" title="Timed Relay Window under test" src="../spikes/live-routing.html" width="1050" height="800"></iframe>
   <iframe id="double-live" title="Timed Double Pass under test" src="../spikes/double-pass.html" width="1050" height="800"></iframe>
+  <iframe id="mobile" title="375px baseline mobile layout" src="../index.html" width="375" height="760"></iframe>
+  <iframe id="mobile-step" title="375px step mode mobile layout" src="../spikes/step-routing.html?level=double-pass" width="375" height="760"></iframe>
   <script>
     // Same-origin iframe exercises the actual browser UI without app-specific hooks.
     const report = document.getElementById('smoke-report');
@@ -19,6 +21,8 @@
     const recorder = document.getElementById('recorder');
     const live = document.getElementById('live');
     const doubleLive = document.getElementById('double-live');
+    const mobile = document.getElementById('mobile');
+    const mobileStep = document.getElementById('mobile-step');
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     let checks = 0;
     function check(condition, message) {
@@ -68,6 +72,30 @@
       check(advances < 60, 'Step mode got stuck without terminal outcome');
       return doc.getElementById('status').dataset.state;
     }
+    function mobileBoardCheck(frame, mirrorKey) {
+      const doc = frame.contentDocument;
+      check(Boolean(doc), 'Mobile game iframe did not load');
+      const boardFrame = doc.querySelector('.board-frame');
+      check(boardFrame.scrollWidth > boardFrame.clientWidth + 50,
+        'Board should scroll instead of expanding the page: frame ' +
+        boardFrame.clientWidth + '/' + boardFrame.scrollWidth +
+        ', viewport ' + frame.contentWindow.innerWidth +
+        ', page ' + doc.documentElement.scrollWidth);
+      check(doc.documentElement.scrollWidth <= frame.contentWindow.innerWidth + 2,
+        'Mobile page should not horizontally overflow outside the board scroller');
+      const mirror = cell(doc, mirrorKey);
+      const rect = mirror.getBoundingClientRect();
+      check(rect.width >= 44 && rect.height >= 44,
+        'Mirror touch target below 44px on 375px phone: ' + rect.width + 'x' + rect.height);
+      const hint = doc.querySelector('.mobile-scroll-hint');
+      check(Boolean(hint) && frame.contentWindow.getComputedStyle(hint).display !== 'none',
+        'Mobile horizontal-scroll hint is not visible');
+      const before = boardFrame.scrollLeft;
+      boardFrame.scrollLeft = boardFrame.scrollWidth;
+      check(boardFrame.scrollLeft > before,
+        'Board does not respond to horizontal scroll');
+    }
+
     async function run() {
       try {
         const doc = game.contentDocument;
@@ -194,6 +222,9 @@
           'Timed Double Pass win should require one between-visits turn');
         check(doubleLiveDoc.getElementById('passes').textContent === '2',
           'Timed Double Pass winning run should visit the live mirror twice');
+
+        mobileBoardCheck(mobile, '3,3');
+        mobileBoardCheck(mobileStep, '4,3');
 
         report.textContent = '__LUMEN_SMOKE_PASS__ ' + checks + ' checks';
         document.body.dataset.smoke = 'pass';
