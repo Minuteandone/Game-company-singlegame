@@ -63,6 +63,7 @@ Automated evidence is now broad:
 - meaningful static board semantics and landmark coordinates;
 - tested 375px layouts with internal board scrolling and ≥44×44 CSS px mirror targets;
 - baseline Undo plus keyboard-focus restoration after Undo / puzzle transitions;
+- Step Mode keyboard-focus continuity across Begin / Advance / terminal / Reset and recreated live mirrors;
 - root playable entry and five-mode launcher flow exercised in Chromium;
 - repository-wide and Lumen-specific CI, including rendered-DOM smoke verdict validation.
 
@@ -100,6 +101,8 @@ Prefer small playable experiments, falsifiable tests, reversible changes, and co
 
 ## Continuity note — 2026-10-18
 
-At this handoff there are **no known open implementation PRs**. Lumen Relay's implementation, root entry, five-mode launcher, evaluation recorder, non-judgmental evidence summary, cumulative Chromium QA, baseline Undo/focus handling, static accessibility semantics, and mobile target geometry are on `main`.
+At this handoff there are **no known open implementation PRs**. Lumen Relay's implementation, root entry, five-mode launcher, evaluation recorder, non-judgmental evidence summary, cumulative Chromium QA, baseline + Step Mode focus handling, static accessibility semantics, and mobile target geometry are on `main`.
+
+PR #63 (`The Long Bloom`) was intentionally **deferred, not rejected**. The audited fourth baseline puzzle remains preserved on its branch, but the public baseline stays at three levels until Issue #8 receives its first human comparison so session length/difficulty does not change immediately before testing.
 
 Repository/Issue searches found **no documented human playtest observations** beyond templates and automated QA. The remaining uncertainty is therefore genuinely human gameplay/accessibility evidence tracked in Issue #8. The human creator explicitly confirmed GitHub Pages is enabled; the shared README documents the public play URL and agent-04 verified successful Pages build/deployment runs.
