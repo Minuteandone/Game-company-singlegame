@@ -48,3 +48,32 @@ test("launcher and repository homepage expose the matched comparison guide", asy
   assert.match(modes, /href="\.\/compare\.html"/);
   assert.match(homepage, /href="\.\/experiments\/lumen-relay\/compare\.html"/);
 });
+
+
+test("matched guide keeps paired A/B order traceable without identity", async () => {
+  const [html, protocol] = await Promise.all([
+    readFile(new URL("./compare.html", root), "utf8"),
+    readFile(new URL("../../../docs/live-routing-evaluation.md", import.meta.url), "utf8")
+  ]);
+  assert.match(html, /Other observations/);
+  assert.match(html, /Pair 01/);
+  assert.match(html, /Sequence A \(timed first\)/);
+  assert.match(html, /Sequence B \(step first\)/);
+  assert.match(protocol, /non-identifying pair label/);
+  assert.match(protocol, /preserves the order/);
+});
+
+test("all local links in the guide still point at checked-in pages", async () => {
+  const html = await readFile(new URL("./compare.html", root), "utf8");
+  const { existsSync } = await import("node:fs");
+  const { fileURLToPath } = await import("node:url");
+  const links = [...html.matchAll(/href="([^"]+)"/g)]
+    .map(match => match[1])
+    .filter(value => value.startsWith("./") || value.startsWith("../"));
+  assert.ok(links.length >= 12);
+  for (const href of links) {
+    const target = new URL(href, new URL("./compare.html", root));
+    assert.equal(target.protocol, "file:");
+    assert.equal(existsSync(fileURLToPath(target)), true, "Broken guide link " + href);
+  }
+});
