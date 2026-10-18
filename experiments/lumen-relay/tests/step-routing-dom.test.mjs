@@ -220,3 +220,22 @@ test("A shortcut changes the pulse without stealing focus from Hint", () => {
   assert.strictEqual(document.activeElement, els.hint);
   assert.equal(Number(els.steps.textContent), stepBefore + 1);
 });
+
+test("finishing via A shortcut on a focused live mirror returns focus to Begin", () => {
+  els.reset.click();
+  els.begin.click();
+  const mirrorButton = liveMirror();
+  mirrorButton.focus();
+  assert.strictEqual(document.activeElement, mirrorButton);
+  const keydown = documentEvents.get("keydown");
+  for (let attempts = 0; attempts < 65 && !els.advance.disabled; attempts++) {
+    keydown({
+      code: "KeyA", altKey: false, ctrlKey: false, metaKey: false, repeat: false,
+      preventDefault() {}
+    });
+  }
+  assert.equal(els.advance.disabled, true);
+  assert.equal(els.begin.disabled, false);
+  assert.strictEqual(document.activeElement, els.begin,
+    "a terminal pulse must not leave focus on a disabled mirror");
+});
