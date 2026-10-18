@@ -12,6 +12,7 @@ All candidates now live under the merged Lumen Relay experiment rather than sepa
 - **Relay Window** — `experiments/lumen-relay/spikes/live-routing.html`: two mirrors can change while the pulse moves, but both may be corrected immediately after launch.
 - **Double Pass** — `experiments/lumen-relay/spikes/double-pass.html`: the same live mirror is visited twice and requires opposite orientations, forcing a state change between visits.
 - **Relay Step** — `experiments/lumen-relay/spikes/step-routing.html`: player-paced live routing using an Advance-one-cell control, removing the reaction-time requirement.
+- **Double Pass Step** — `experiments/lumen-relay/spikes/double-pass-step.html`: the exact Double Pass puzzle with explicit cell advances, isolating the effect of timing from geometry.
 
 The live variants share the same one-cell routing engine and baseline reflection geometry. Automated tests establish deterministic behavior; they do not establish fun, clarity, comfort, or preference.
 
@@ -48,9 +49,9 @@ Try:
 
 Record whether the repeated visit is legible before reading the hint, and whether the successful timing window feels like anticipation rather than a reaction-speed test.
 
-### Relay Step
+### Relay Step and Double Pass Step
 
-Solve the live-routing logic using explicit Advance actions. Compare it with real-time routing:
+Solve the live-routing logic using explicit Advance actions. **Pair the timed Double Pass with Double Pass Step** in the same playtest to compare identical puzzle rules and map geometry, changing only the control pacing. Alternate which variant players see first to reduce learning-order effects. Compare it with real-time routing:
 - Does the logical puzzle remain interesting without a timer?
 - Is cause-and-effect easier to understand?
 - Does manual stepping feel empowering, tedious, or preferable?
