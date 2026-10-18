@@ -87,17 +87,20 @@ function renderBoard() {
       } else if (key === sourceKey) {
         tile.classList.add("tile--source");
         tile.textContent = "◉";
+        tile.setAttribute("role", "img");
         tile.setAttribute("aria-label", cellLabel(x, y, "Pulse sender"));
       } else if (key === goalKey) {
         tile.classList.add("tile--goal");
         tile.textContent = "✿";
+        tile.setAttribute("role", "img");
         tile.setAttribute("aria-label", cellLabel(x, y, "Sleeping flower"));
       } else if (wallKeys.has(key)) {
         tile.classList.add("tile--wall");
         tile.textContent = "■";
+        tile.setAttribute("role", "img");
         tile.setAttribute("aria-label", cellLabel(x, y, "Blocking stone"));
       } else {
-        tile.setAttribute("aria-label", cellLabel(x, y, "Empty cell"));
+        tile.setAttribute("aria-hidden", "true");
       }
       tiles.set(key, tile);
       fragment.appendChild(tile);
