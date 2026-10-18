@@ -202,6 +202,15 @@
         stepDoc.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', bubbles: true }));
         check(stepDoc.activeElement === stepDoc.getElementById('begin'),
           'Keyboard Reset from a removed mirror did not restore focus to Begin');
+        stepDoc.getElementById('begin').click();
+        cell(stepDoc, '2,4').focus();
+        let shortcutSteps = 0;
+        while (!stepDoc.getElementById('advance').disabled && shortcutSteps++ < 60) {
+          stepDoc.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyA', bubbles: true }));
+        }
+        check(shortcutSteps < 60, 'Step keyboard shortcut run never terminated');
+        check(stepDoc.activeElement === stepDoc.getElementById('begin'),
+          'Terminal Step Mode left keyboard focus on a disabled live mirror');
 
         const doubleDoc = doubleStep.contentDocument;
         check(doubleDoc.getElementById('level-title').textContent === 'Double Pass',
