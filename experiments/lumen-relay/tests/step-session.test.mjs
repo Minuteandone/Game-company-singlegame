@@ -11,6 +11,22 @@ const engine = {
   }
 };
 
+// Mirrors the real live-engine.mjs outcome convention: null means in flight.
+// The adapter intentionally takes (level, pulse, mirrors), while the other
+// agent's engine takes (level, mirrors, pulse) and can be wrapped in one lambda.
+const nullOutcomeEngine = {
+  initialPulse: l => ({ ...l.source, outcome: null, steps: 0 }),
+  stepPulse: (l, pulse, mirror) => {
+    const x = pulse.x + 1;
+    return {
+      ...pulse,
+      x,
+      steps: pulse.steps + 1,
+      outcome: x === l.goal.x ? (mirror === "/" ? "won" : "escaped") : null
+    };
+  }
+};
+
 test("step mode does not advance without an explicit call", () => {
   const session = createStepSession(level, engine, "\\");
   assert.equal(session.snapshot.pulse.x, 0);
@@ -41,6 +57,33 @@ test("terminal state cannot advance or rotate until reset", () => {
   assert.equal(session.snapshot.pulse.outcome, "moving");
   assert.equal(session.snapshot.steps, 0);
   assert.equal(session.snapshot.generation, before.generation + 1);
+});
+
+test("live engine's null active outcome advances and accepts between-step rotation", () => {
+  const session = createStepSession(level, nullOutcomeEngine, "\\");
+  assert.equal(session.snapshot.pulse.outcome, null);
+  session.advance();
+  assert.equal(session.snapshot.pulse.x, 1);
+  session.advance();
+  assert.equal(session.snapshot.pulse.x, 2);
+  session.rotate("/");
+  assert.equal(session.advance().pulse.outcome, "won");
+  assert.equal(session.snapshot.pulse.steps, 3);
+});
+
+test("null-outcome terminal failure remains locked; reset begins new attempt", () => {
+  const session = createStepSession(level, nullOutcomeEngine, "\\");
+  session.advance();
+  session.advance();
+  assert.equal(session.advance().pulse.outcome, "escaped");
+  const failed = session.snapshot;
+  session.advance();
+  session.rotate("/");
+  assert.deepEqual(session.snapshot, failed);
+  session.reset();
+  assert.equal(session.snapshot.pulse.outcome, null);
+  assert.equal(session.snapshot.steps, 0);
+  assert.equal(session.snapshot.mirrors, "\\");
 });
 
 test("invalid engines fail immediately", () => {
