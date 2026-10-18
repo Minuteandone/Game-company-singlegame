@@ -189,7 +189,7 @@ function renderEvidenceSummary(records) {
   const directions = summary.evidenceDirections;
   elements.evidenceSummary.textContent =
     summary.totalSessions + " saved session" + (summary.totalSessions === 1 ? "" : "s") +
-    ". Matched Double Pass: " + summary.matchedDoublePass.timedSessions +
+    ". Matched Double Pass observed: " + summary.matchedDoublePass.timedSessions +
     " timed / " + summary.matchedDoublePass.stepSessions +
     " step. Evidence directions — inconclusive: " + (directions.inconclusive ?? 0) +
     ", Continue baseline: " + (directions["continue baseline"] ?? 0) +
