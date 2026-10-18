@@ -45,3 +45,20 @@ test("launcher and repository homepage expose the matched comparison guide", asy
   assert.match(modes, /href="\.\/compare\.html"/);
   assert.match(homepage, /href="\.\/experiments\/lumen-relay\/compare\.html"/);
 });
+
+
+test("playtest guide preserves A/B play order without requesting participant identity", async () => {
+  const [html, protocol] = await Promise.all([
+    readFile(new URL("./compare.html", root), "utf8"),
+    readFile(new URL("../../../docs/live-routing-evaluation.md", import.meta.url), "utf8")
+  ]);
+  assert.match(html, /Other observations/);
+  assert.match(html, /Pair 01/);
+  assert.match(html, /Sequence A \(timed first\)/);
+  assert.match(html, /Sequence B \(step first\)/);
+  assert.match(html, /leave out names, contact details, and other identifying information/i);
+  assert.match(html, /Sharing is optional/);
+  assert.match(protocol, /non-identifying pair label/);
+  assert.match(protocol, /first-versus-second exposure/);
+  assert.match(protocol, /public sharing are optional/);
+});
