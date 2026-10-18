@@ -89,3 +89,24 @@ test("null-outcome terminal failure remains locked; reset begins new attempt", (
 test("invalid engines fail immediately", () => {
   assert.throws(() => createStepSession(level, {}, "/"), TypeError);
 });
+
+test("custom isActive predicate supports third-party pulse statuses", () => {
+  const specialEngine = {
+    initialPulse: l => ({ ...l.source, status: "flying" }),
+    stepPulse: (l, pulse) => ({ ...pulse, x: pulse.x + 1, status: pulse.x + 1 >= l.goal.x ? "delivered" : "flying" }),
+    isActive: pulse => pulse.status === "flying"
+  };
+  const session = createStepSession(level, specialEngine, {});
+  session.advance();
+  session.rotate({ flip: true });
+  session.advance();
+  assert.equal(session.snapshot.pulse.x, 2);
+  assert.equal(session.advance().pulse.status, "delivered");
+  session.advance();
+  assert.equal(session.snapshot.steps, 3);
+  assert.deepEqual(session.snapshot.mirrors, { flip: true });
+});
+
+test("non-callable isActive is rejected", () => {
+  assert.throws(() => createStepSession(level, { ...engine, isActive: false }, {}), /isActive/);
+});
