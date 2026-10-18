@@ -221,7 +221,7 @@ async function sendPulse() {
     chirp(720, 0.3);
     const last = state.levelIndex === LEVELS.length - 1;
     setStatus(last
-      ? "All three flowers are awake! The garden is glowing. ✿"
+      ? "Every flower is awake! The garden is glowing. ✿"
       : "The flower is awake! ✿ Beautifully routed.", "win");
   } else {
     const messages = {
