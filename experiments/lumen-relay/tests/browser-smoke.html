@@ -7,12 +7,16 @@
   <iframe id="game" title="Baseline Lumen Relay under test" src="../index.html" width="1050" height="800"></iframe>
   <iframe id="step" title="Relay Window step mode under test" src="../spikes/step-routing.html" width="1050" height="800"></iframe>
   <iframe id="double-step" title="Double Pass step mode under test" src="../spikes/step-routing.html?level=double-pass" width="1050" height="800"></iframe>
+  <iframe id="live" title="Timed Relay Window under test" src="../spikes/live-routing.html" width="1050" height="800"></iframe>
+  <iframe id="double-live" title="Timed Double Pass under test" src="../spikes/double-pass.html" width="1050" height="800"></iframe>
   <script>
     // Same-origin iframe exercises the actual browser UI without app-specific hooks.
     const report = document.getElementById('smoke-report');
     const game = document.getElementById('game');
     const step = document.getElementById('step');
     const doubleStep = document.getElementById('double-step');
+    const live = document.getElementById('live');
+    const doubleLive = document.getElementById('double-live');
     const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
     let checks = 0;
     function check(condition, message) {
@@ -127,6 +131,45 @@
           'Between-visits Double Pass rotation should win without a timer');
         check(doubleDoc.getElementById('turns').textContent === '1',
           'Double Pass step win should require one rotation');
+
+        const liveDoc = live.contentDocument;
+        check(Boolean(liveDoc), 'Timed Relay Window iframe did not load');
+        check(cell(liveDoc, '2,4').disabled, 'Timed Relay Window mirror unlocked before launch');
+        liveDoc.getElementById('launch').click();
+        check(!cell(liveDoc, '2,4').disabled, 'Timed Relay Window mirror stayed locked in flight');
+        await until(() => liveDoc.getElementById('status').dataset.state === 'fail',
+          'Timed Relay Window no-flip attempt did not fail', 12000);
+        liveDoc.getElementById('reset').click();
+        liveDoc.getElementById('launch').click();
+        rotate(liveDoc, '2,4');
+        rotate(liveDoc, '6,1');
+        await until(() => liveDoc.getElementById('status').dataset.state === 'win',
+          'Timed Relay Window in-flight rotations did not win', 12000);
+        check(liveDoc.getElementById('turns').textContent === '2',
+          'Timed Relay Window should record two in-flight turns');
+
+        const doubleLiveDoc = doubleLive.contentDocument;
+        check(Boolean(doubleLiveDoc), 'Timed Double Pass iframe did not load');
+        check(cell(doubleLiveDoc, '4,3').disabled, 'Timed Double Pass mirror unlocked before launch');
+        doubleLiveDoc.getElementById('launch').click();
+        check(!cell(doubleLiveDoc, '4,3').disabled, 'Timed Double Pass mirror stayed locked in flight');
+        rotate(doubleLiveDoc, '4,3');
+        await until(() => doubleLiveDoc.getElementById('status').dataset.state === 'fail',
+          'Timed Double Pass early rotation did not fail', 12000);
+
+        doubleLiveDoc.getElementById('reset').click();
+        doubleLiveDoc.getElementById('launch').click();
+        await until(() => doubleLiveDoc.getElementById('passes').textContent === '1',
+          'Timed Double Pass never reached first mirror visit', 12000);
+        check(doubleLiveDoc.getElementById('status').dataset.state === 'ready',
+          'Timed Double Pass terminated before its between-visits window');
+        rotate(doubleLiveDoc, '4,3');
+        await until(() => doubleLiveDoc.getElementById('status').dataset.state === 'win',
+          'Timed Double Pass between-visits rotation did not win', 12000);
+        check(doubleLiveDoc.getElementById('turns').textContent === '1',
+          'Timed Double Pass win should require one between-visits turn');
+        check(doubleLiveDoc.getElementById('passes').textContent === '2',
+          'Timed Double Pass winning run should visit the live mirror twice');
 
         report.textContent = '__LUMEN_SMOKE_PASS__ ' + checks + ' checks';
         document.body.dataset.smoke = 'pass';
