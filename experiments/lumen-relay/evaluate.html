@@ -71,6 +71,7 @@
         <div class="field">
           <label for="device">Device class</label>
           <select id="device">
+            <option value="not recorded" selected>Not recorded / unknown</option>
             <option value="desktop/laptop">Desktop / laptop</option>
             <option value="phone">Phone</option>
             <option value="tablet">Tablet</option>
@@ -80,6 +81,7 @@
         <div class="field">
           <label for="input">Primary input</label>
           <select id="input">
+            <option value="not recorded" selected>Not recorded / unknown</option>
             <option value="mouse/trackpad">Mouse / trackpad</option>
             <option value="keyboard">Keyboard only</option>
             <option value="touch">Touch</option>
@@ -92,7 +94,7 @@
           <select id="viewport">
             <option value="wide">Wide</option>
             <option value="narrow">Narrow / phone-sized</option>
-            <option value="unknown">Unknown</option>
+            <option value="unknown" selected>Unknown / not recorded</option>
           </select>
         </div>
         <div class="field">
@@ -100,16 +102,17 @@
           <select id="motion">
             <option value="not enabled">Not enabled</option>
             <option value="enabled">Enabled</option>
-            <option value="not tested">Not tested / unknown</option>
+            <option value="not tested" selected>Not tested / unknown</option>
           </select>
         </div>
         <div class="field">
           <label for="result">Session result</label>
+          <span class="small">Select Completed only after the puzzle was actually solved.</span>
           <select id="result">
             <option value="completed">Completed / solved</option>
             <option value="attempted">Attempted, not completed</option>
             <option value="observed only">Observed only</option>
-            <option value="not recorded">Not recorded</option>
+            <option value="not recorded" selected>Not recorded</option>
           </select>
         </div>
       </div>
