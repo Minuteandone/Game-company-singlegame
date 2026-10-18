@@ -115,7 +115,10 @@
         const initialAngle = teachingMirror.textContent;
         rotate(doc, '3,3');
         check(!doc.getElementById('undo').disabled, 'Undo should enable after a mirror turn');
+        doc.getElementById('undo').focus();
         doc.getElementById('undo').click();
+        check(doc.activeElement === teachingMirror,
+          'Undo lost keyboard focus after the button became disabled');
         check(teachingMirror.textContent === initialAngle, 'Undo should restore the mirror angle');
         check(doc.getElementById('turns').textContent === '0', 'Undo should restore net turn count');
         check(doc.getElementById('undo').disabled, 'Undo should disable when history becomes empty');
@@ -132,6 +135,8 @@
         doc.getElementById('next').click();
         check(doc.getElementById('level-title').textContent === 'The Detour',
           'Next puzzle did not load');
+        check(doc.activeElement === doc.getElementById('level-title'),
+          'Next puzzle did not focus the new level heading');
         rotate(doc, '3,5');
         rotate(doc, '6,1');
         await shoot(doc, 'win');
@@ -141,6 +146,8 @@
         doc.getElementById('next').click();
         check(doc.getElementById('level-title').textContent === 'Crossed Wires',
           'Third puzzle did not load');
+        check(doc.activeElement === doc.getElementById('level-title'),
+          'Final puzzle transition did not focus its heading');
         rotate(doc, '2,1');
         rotate(doc, '7,5');
         rotate(doc, '7,2');
@@ -155,6 +162,8 @@
         doc.getElementById('next').click();
         check(doc.getElementById('level-title').textContent === 'First Light',
           'Replay did not return to first puzzle');
+        check(doc.activeElement === doc.getElementById('level-title'),
+          'Replay did not focus First Light heading');
         check(doc.getElementById('explore-after-win').hidden,
           'Mode launcher completion link stayed visible after replay');
         doc.getElementById('fire').click();

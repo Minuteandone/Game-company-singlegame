@@ -161,6 +161,10 @@ function resetLevel() {
 }
 function undoLastTurn() {
   if (state.playing || state.won || state.history.length === 0) return;
+  // A keyboard user's focused Undo button may become disabled after this
+  // action. Return focus to the affected mirror rather than losing it.
+  // Keyboard shortcut U does not steal focus from a different control.
+  const focusMirrorAfterUndo = document.activeElement === elements.undo;
   const result = undoTurn(state.mirrors, state.history);
   const { x, y } = result.undone;
   state.mirrors = result.mirrors;
@@ -175,6 +179,7 @@ function undoLastTurn() {
   clearGlow();
   displayCounters();
   syncControls();
+  if (focusMirrorAfterUndo) tile?.focus();
   setStatus(cellLabel(x, y, "Last turn undone; mirror restored to " +
     mirrorOrientation(state.mirrors[key])) + ". Send a pulse when ready.");
   chirp(390);
@@ -238,6 +243,9 @@ elements.reset.addEventListener("click", resetLevel);
 elements.undo.addEventListener("click", undoLastTurn);
 elements.next.addEventListener("click", () => {
   loadLevel(state.levelIndex === LEVELS.length - 1 ? 0 : state.levelIndex + 1);
+  // Next/Replay becomes hidden once the new puzzle loads. Move focus to its
+  // programmatically focusable heading to announce the new level context.
+  elements.title.focus();
 });
 elements.hint.addEventListener("click", () => setStatus(currentLevel().hint));
 elements.sound.addEventListener("click", () => {
