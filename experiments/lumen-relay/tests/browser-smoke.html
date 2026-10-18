@@ -190,6 +190,7 @@
         const recorderDoc = recorder.contentDocument;
         check(Boolean(recorderDoc.getElementById('save-session')), 'Recorder did not initialize');
         recorderDoc.getElementById('candidate').value = 'double-pass-step';
+        recorderDoc.getElementById('result').value = 'observed only';
         recorderDoc.getElementById('discoverability').value = 'Smoke test: candidate link discovered';
         recorderDoc.getElementById('save-session').click();
         check(recorderDoc.querySelectorAll('#saved-list .saved-item').length === 1,
