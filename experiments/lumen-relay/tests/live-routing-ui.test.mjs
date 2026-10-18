@@ -6,7 +6,8 @@ import { fileURLToPath } from "node:url";
 for (const relative of [
   "../spikes/live-routing.mjs",
   "../spikes/double-pass.mjs",
-  "../spikes/step-routing.mjs"
+  "../spikes/step-routing.mjs",
+  "../evaluate.mjs"
 ]) {
   test(relative + " parses as JavaScript", () => {
     const target = fileURLToPath(new URL(relative, import.meta.url));
