@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Lumen Relay browser smoke harness</title></head>
+<body>
+  <h1>Lumen Relay browser smoke harness</h1>
+  <pre id="smoke-report">SMOKE_RUNNING</pre>
+  <iframe id="game" title="Lumen Relay under test" src="../index.html" width="1050" height="800"></iframe>
+  <script>
+    // Same-origin iframe exercises the actual browser UI without app-specific hooks.
+    const report = document.getElementById('smoke-report');
+    const game = document.getElementById('game');
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+    let checks = 0;
+    function check(condition, message) {
+      if (!condition) throw new Error(message);
+      checks++;
+    }
+    async function until(predicate, description, timeout = 8000) {
+      const end = Date.now() + timeout;
+      while (Date.now() < end) {
+        if (predicate()) return;
+        await sleep(35);
+      }
+      throw new Error('Timed out: ' + description);
+    }
+    function cell(doc, coordinates) {
+      const tile = doc.querySelector('#board [data-key="' + coordinates + '"]');
+      check(tile && tile.tagName === 'BUTTON', 'Mirror button missing: ' + coordinates);
+      return tile;
+    }
+    function rotate(doc, coordinates) {
+      const tile = cell(doc, coordinates);
+      check(!tile.disabled, 'Mirror unexpectedly disabled: ' + coordinates);
+      const before = tile.textContent;
+      tile.click();
+      check(tile.textContent !== before, 'Mirror did not rotate: ' + coordinates);
+      check(/(slash|backslash) orientation/.test(tile.getAttribute('aria-label') || ''),
+        'Mirror orientation missing from accessible name: ' + coordinates);
+    }
+    async function shoot(doc, expectedState) {
+      const fire = doc.getElementById('fire');
+      check(!fire.disabled, 'Send pulse unexpectedly disabled');
+      fire.click();
+      await until(() => doc.getElementById('status').dataset.state === expectedState,
+        'Pulse did not report ' + expectedState);
+    }
+    async function run() {
+      try {
+        const doc = game.contentDocument;
+        check(Boolean(doc), 'Game iframe did not load');
+        check(doc.querySelectorAll('#board .tile').length === 63,
+          'Initial 9x7 board is missing');
+        check(doc.querySelectorAll('#board button').length === 1,
+          'First level should introduce exactly one mirror');
+        check(doc.getElementById('next').hidden, 'Next button visible before win');
+        check(doc.getElementById('sound').getAttribute('aria-pressed') === 'false',
+          'Sound must default off');
+        await shoot(doc, 'fail');
+        rotate(doc, '3,3');
+        await shoot(doc, 'win');
+        check(!doc.getElementById('next').hidden, 'Next button missing after first win');
+
+        doc.getElementById('next').click();
+        check(doc.getElementById('level-title').textContent === 'The Detour',
+          'Next puzzle did not load');
+        rotate(doc, '3,5');
+        rotate(doc, '6,1');
+        await shoot(doc, 'win');
+
+        doc.getElementById('next').click();
+        check(doc.getElementById('level-title').textContent === 'Crossed Wires',
+          'Third puzzle did not load');
+        rotate(doc, '2,1');
+        rotate(doc, '7,5');
+        rotate(doc, '7,2');
+        await shoot(doc, 'win');
+        check(doc.getElementById('next').textContent.includes('Play again'),
+          'Completion replay control missing');
+
+        doc.getElementById('next').click();
+        check(doc.getElementById('level-title').textContent === 'First Light',
+          'Replay did not return to first puzzle');
+        doc.getElementById('fire').click();
+        doc.getElementById('reset').click();
+        check(doc.getElementById('shots').textContent === '0',
+          'Reset did not clear shots during in-flight pulse');
+        await sleep(1800);
+        check(doc.getElementById('status').dataset.state === 'ready',
+          'Cancelled in-flight pulse mutated reset state');
+        check(doc.getElementById('next').hidden, 'Reset leaked completed-level state');
+
+        report.textContent = '__LUMEN_SMOKE_PASS__ ' + checks + ' checks';
+        document.body.dataset.smoke = 'pass';
+      } catch (error) {
+        report.textContent = '__LUMEN_SMOKE_FAIL__ ' + (error.stack || error.message);
+        document.body.dataset.smoke = 'fail';
+      }
+    }
+    window.addEventListener('load', () => { void run(); });
+  </script>
+</body>
+</html>
