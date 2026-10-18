@@ -35,6 +35,12 @@
     .saved-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
     .saved-actions button{border:1px solid #506979;border-radius:7px;background:#172b39;color:#edf8fb;padding:7px 10px;cursor:pointer}
     .empty{color:#91a8b3;font-style:italic}
+    .manual-copy{margin:15px 0 0;border:1px solid #669285;border-radius:12px;padding:16px;background:#102d31}
+    .manual-copy h3{margin:0 0 8px;font-size:18px;color:#a7f4da}
+    .manual-copy p{color:#c2d9d5;font-size:13px;line-height:1.6}
+    .manual-copy label{display:block;font-weight:800;font-size:13px;margin:12px 0 7px}
+    .manual-copy textarea{width:100%;min-height:200px;resize:vertical;border:1px solid #678c88;border-radius:9px;padding:12px;background:#0b1c23;color:#ecf8f3;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}
+    .manual-copy button{margin-top:10px;min-height:44px;padding:10px 16px;border:1px solid #83d5bf;border-radius:9px;color:#0a2427;background:#a7f4da;font-weight:800}
     .small{font-size:12px;color:#91a8b3}
     @media(max-width:650px){.grid-two{grid-template-columns:1fr}.actions button,.actions a{flex:1 1 100%}.saved-head{display:block}}
   </style>
@@ -161,6 +167,13 @@
         <button id="reset-form" class="secondary-action" type="button">Clear form</button>
       </div>
       <p id="status" class="status" role="status" aria-live="polite"></p>
+      <section id="manual-copy-panel" class="manual-copy" aria-labelledby="manual-copy-title" hidden>
+        <h3 id="manual-copy-title">Report available for manual copy</h3>
+        <p>Automatic clipboard access was blocked. Your complete report is shown below and has not been uploaded. Select the text, then use your device's Copy action (for example, Ctrl+C or Command+C).</p>
+        <label for="manual-copy-text">Complete playtest report</label>
+        <textarea id="manual-copy-text" rows="12" spellcheck="false" readonly></textarea>
+        <button id="select-manual-copy" type="button">Select report text</button>
+      </section>
     </section>
 
     <section class="recorder-card" aria-labelledby="saved-title">

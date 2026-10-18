@@ -16,7 +16,10 @@ Object.assign(elements, {
   resetForm: byId("reset-form"),
   clearSaved: byId("clear-saved"),
   savedList: byId("saved-list"),
-  status: byId("status")
+  status: byId("status"),
+  manualCopyPanel: byId("manual-copy-panel"),
+  manualCopyText: byId("manual-copy-text"),
+  selectManualCopy: byId("select-manual-copy")
 });
 
 // Optional deep link from a playable page. Unknown values are ignored.
@@ -122,21 +125,40 @@ function reportFor(record) {
 }
 
 async function copyText(text) {
+  // A successful copy clears any old manual preview, but a failed copy must
+  // preserve the complete report in a visible, selectable control.
+  elements.manualCopyPanel.hidden = true;
+
   try {
-    await navigator.clipboard.writeText(text);
-    return true;
+    if (globalThis.navigator?.clipboard?.writeText) {
+      await globalThis.navigator.clipboard.writeText(text);
+      return true;
+    }
   } catch {
-    const area = document.createElement("textarea");
-    area.value = text;
-    area.setAttribute("readonly", "");
-    area.style.position = "fixed";
-    area.style.opacity = "0";
-    document.body.appendChild(area);
-    area.select();
-    const copied = document.execCommand("copy");
-    area.remove();
-    return copied;
+    // Clipboard permissions are browser/device-dependent. Try legacy copy.
   }
+
+  let temporary;
+  try {
+    temporary = document.createElement("textarea");
+    temporary.value = text;
+    temporary.setAttribute("readonly", "");
+    temporary.style.position = "fixed";
+    temporary.style.opacity = "0";
+    document.body.appendChild(temporary);
+    temporary.select();
+    if (document.execCommand("copy")) return true;
+  } catch {
+    // The legacy API may be unsupported or denied.
+  } finally {
+    temporary?.remove();
+  }
+
+  elements.manualCopyText.value = text;
+  elements.manualCopyPanel.hidden = false;
+  elements.manualCopyText.focus();
+  elements.manualCopyText.select();
+  return false;
 }
 
 function setStatus(message) {
@@ -183,7 +205,7 @@ function renderRecords() {
     copy.textContent = "Copy Issue #8 report";
     copy.addEventListener("click", async () => {
       const ok = await copyText(reportFor(record));
-      setStatus(ok ? "Saved session report copied." : "Could not copy automatically; select the text manually.");
+      setStatus(ok ? "Saved session report copied." : "Automatic copy was blocked; select and copy the saved report shown below.");
     });
 
     const remove = document.createElement("button");
@@ -225,7 +247,13 @@ elements.saveSession.addEventListener("click", () => {
 
 elements.copyCurrent.addEventListener("click", async () => {
   const ok = await copyText(reportFor(currentRecord()));
-  setStatus(ok ? "Current Issue #8 report copied." : "Could not copy automatically; save the session and copy again.");
+  setStatus(ok ? "Current Issue #8 report copied." : "Automatic copy was blocked; select and copy the complete report shown below.");
+});
+
+elements.selectManualCopy.addEventListener("click", () => {
+  elements.manualCopyText.focus();
+  elements.manualCopyText.select();
+  setStatus("Report text selected. Use your device's Copy action to share it.");
 });
 
 elements.resetForm.addEventListener("click", resetForm);
