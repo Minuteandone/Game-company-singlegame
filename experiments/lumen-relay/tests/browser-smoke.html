@@ -258,10 +258,15 @@
         const liveDoc = live.contentDocument;
         check(Boolean(liveDoc), 'Timed Relay Window iframe did not load');
         check(cell(liveDoc, '2,4').disabled, 'Timed Relay Window mirror unlocked before launch');
+        liveDoc.getElementById('launch').focus();
         liveDoc.getElementById('launch').click();
         check(!cell(liveDoc, '2,4').disabled, 'Timed Relay Window mirror stayed locked in flight');
+        check(liveDoc.activeElement === cell(liveDoc, '2,4'),
+          'Timed Relay Window did not focus the first live mirror after Launch disabled');
         await until(() => liveDoc.getElementById('status').dataset.state === 'fail',
           'Timed Relay Window no-flip attempt did not fail', 12000);
+        check(liveDoc.activeElement === liveDoc.getElementById('launch'),
+          'Timed Relay Window failure did not return focus to Retry');
         liveDoc.getElementById('reset').click();
         liveDoc.getElementById('launch').click();
         rotate(liveDoc, '2,4');
@@ -270,15 +275,22 @@
           'Timed Relay Window in-flight rotations did not win', 12000);
         check(liveDoc.getElementById('turns').textContent === '2',
           'Timed Relay Window should record two in-flight turns');
+        check(liveDoc.activeElement === liveDoc.getElementById('launch'),
+          'Timed Relay Window win did not return focus to Retry');
 
         const doubleLiveDoc = doubleLive.contentDocument;
         check(Boolean(doubleLiveDoc), 'Timed Double Pass iframe did not load');
         check(cell(doubleLiveDoc, '4,3').disabled, 'Timed Double Pass mirror unlocked before launch');
+        doubleLiveDoc.getElementById('launch').focus();
         doubleLiveDoc.getElementById('launch').click();
         check(!cell(doubleLiveDoc, '4,3').disabled, 'Timed Double Pass mirror stayed locked in flight');
+        check(doubleLiveDoc.activeElement === cell(doubleLiveDoc, '4,3'),
+          'Timed Double Pass did not focus the live mirror when Launch disabled');
         rotate(doubleLiveDoc, '4,3');
         await until(() => doubleLiveDoc.getElementById('status').dataset.state === 'fail',
           'Timed Double Pass early rotation did not fail', 12000);
+        check(doubleLiveDoc.activeElement === doubleLiveDoc.getElementById('launch'),
+          'Timed Double Pass failure did not focus Retry');
 
         doubleLiveDoc.getElementById('reset').click();
         doubleLiveDoc.getElementById('launch').click();
@@ -293,6 +305,17 @@
           'Timed Double Pass win should require one between-visits turn');
         check(doubleLiveDoc.getElementById('passes').textContent === '2',
           'Timed Double Pass winning run should visit the live mirror twice');
+        check(doubleLiveDoc.activeElement === doubleLiveDoc.getElementById('launch'),
+          'Timed Double Pass win did not focus Retry');
+        doubleLiveDoc.getElementById('launch').click();
+        check(doubleLiveDoc.activeElement === cell(doubleLiveDoc, '4,3'),
+          'Timed Double Pass next attempt did not focus live mirror');
+        doubleLiveDoc.dispatchEvent(new KeyboardEvent('keydown',
+          { key: 'r', code: 'KeyR', bubbles: true }));
+        check(doubleLiveDoc.activeElement === doubleLiveDoc.getElementById('launch'),
+          'Timed Double Pass keyboard reset left focus on a removed live mirror');
+        check(cell(doubleLiveDoc, '4,3').disabled,
+          'Timed Double Pass mirror stayed active after keyboard reset');
 
         mobileBoardCheck(mobile, '3,3');
         mobileBoardCheck(mobileStep, '4,3');

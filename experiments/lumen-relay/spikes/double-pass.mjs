@@ -148,7 +148,15 @@ function syncControls() {
   }
 }
 
+function focusedLiveMirror() {
+  const focusedKey = document.activeElement?.dataset?.key;
+  return Boolean(focusedKey && liveKeys.has(focusedKey));
+}
+
 function resetExperiment() {
+  // R can reset while a mirror is focused. The board is recreated, so return
+  // focus to the enabled Launch button rather than an element now detached.
+  const focusLaunch = focusedLiveMirror();
   state.generation += 1;
   state.mirrors = createMirrorState(DOUBLE_PASS_LEVEL);
   state.pulse = createLivePulse(DOUBLE_PASS_LEVEL);
@@ -159,6 +167,7 @@ function resetExperiment() {
   updateCounters();
   syncControls();
   setStatus("The gold mirror starts correct for pass one. Launch, wait for the first pass, then flip it.");
+  if (focusLaunch) elements.launch.focus();
 }
 
 function wait(ms) {
@@ -167,6 +176,9 @@ function wait(ms) {
 
 async function launch() {
   if (state.running) return;
+  // Launch becomes disabled while the pulse flies; a keyboard-activated
+  // launch should hand focus to the first usable live mirror.
+  const focusFirstMirror = document.activeElement === elements.launch;
 
   state.generation += 1;
   const generation = state.generation;
@@ -180,6 +192,7 @@ async function launch() {
   updateCounters();
   syncControls();
   setStatus("Pulse launched. Do not flip yet — let it clear the gold mirror once.");
+  if (focusFirstMirror) tiles.get([...liveKeys][0])?.focus();
 
   while (!state.pulse.outcome && generation === state.generation) {
     await wait(tickMs);
@@ -214,7 +227,11 @@ async function launch() {
     );
   }
 
+  // A live mirror becomes disabled at the terminal outcome. Do not strand
+  // keyboard focus there: the enabled Retry launch is the next action.
+  const focusRetry = focusedLiveMirror();
   syncControls();
+  if (focusRetry) elements.launch.focus();
 }
 
 elements.launch.addEventListener("click", () => void launch());
