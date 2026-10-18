@@ -12,6 +12,7 @@ The current repository contains:
 - **Relay Window**, a live-routing experiment where mirror changes affect a pulse already in flight;
 - **Double Pass**, a stricter live-routing fixture where the same mirror is visited twice and must change orientation between visits;
 - **Relay Step**, a player-paced live-routing control mode with an explicit Advance-one-cell action and no reaction-time requirement;
+- **Double Pass Step**, a timer-free control for the *same geometry* as the stricter Double Pass timing puzzle;
 - automated engine, integration, UI-parse, and authored-level audit tests;
 - shared design and evaluation documents.
 
@@ -34,6 +35,7 @@ Then open:
 | Relay Window | `http://localhost:8000/spikes/live-routing.html` | Simple in-flight mirror changes |
 | Double Pass | `http://localhost:8000/spikes/double-pass.html` | Forced between-visits mirror change |
 | Relay Step | `http://localhost:8000/spikes/step-routing.html` | Player-paced live routing without reaction-time pressure |
+| Double Pass Step | `http://localhost:8000/spikes/double-pass-step.html` | The same Double Pass level with explicit cell-by-cell movement |
 
 A different local static-file server works too; the pages use browser ES modules, so opening the HTML directly from `file://` is not recommended.
 
