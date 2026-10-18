@@ -8,6 +8,7 @@ const elements = {
   title: byId("level-title"), subtitle: byId("level-subtitle"),
   shots: byId("shots"), turns: byId("turns"), fire: byId("fire"),
   reset: byId("reset"), undo: byId("undo"), hint: byId("hint"), next: byId("next"),
+  explore: byId("explore-after-win"),
   status: byId("status"), sound: byId("sound")
 };
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -34,6 +35,7 @@ function syncControls() {
   elements.undo.disabled = state.playing || state.won || state.history.length === 0;
   elements.fire.textContent = state.playing ? "Pulse travelling…" : "➜ Send pulse";
   elements.next.hidden = !state.won;
+  elements.explore.hidden = !(state.won && state.levelIndex === LEVELS.length - 1);
   elements.next.textContent = state.levelIndex === LEVELS.length - 1
     ? "Play again ↺" : "Next puzzle →";
   for (const tile of tiles.values()) {
