@@ -1,6 +1,8 @@
 import { createMirrorState, positionKey, rotateMirror } from "../src/engine.mjs";
 import { advanceLivePulse, createLivePulse } from "./live-engine.mjs";
 import { LIVE_LEVEL } from "./live-level.mjs";
+import { DOUBLE_PASS_LEVEL } from "./double-pass-level.mjs";
+import { selectStepLevel } from "./step-level-choice.mjs";
 import { createStepSession } from "./step-session.mjs";
 
 const byId = id => document.getElementById(id);
@@ -15,15 +17,17 @@ const elements = {
   turns: byId("turns")
 };
 
-const liveKeys = new Set(LIVE_LEVEL.liveMirrorKeys);
+const ACTIVE_LEVEL = selectStepLevel(window.location.search);
+const IS_DOUBLE_PASS = ACTIVE_LEVEL === DOUBLE_PASS_LEVEL;
+const liveKeys = new Set(ACTIVE_LEVEL.liveMirrorKeys);
 const sessionEngine = Object.freeze({
   initialPulse: createLivePulse,
   stepPulse: (level, pulse, mirrors) => advanceLivePulse(level, mirrors, pulse)
 });
 let session = createStepSession(
-  LIVE_LEVEL,
+  ACTIVE_LEVEL,
   sessionEngine,
-  createMirrorState(LIVE_LEVEL)
+  createMirrorState(ACTIVE_LEVEL)
 );
 
 const state = {
@@ -42,9 +46,14 @@ function setStatus(message, kind = "ready") {
   elements.status.dataset.state = kind;
 }
 
+function countLiveVisits(pulse) {
+  return pulse.path.filter(({ x, y }) => liveKeys.has(positionKey(x, y))).length;
+}
+
 function updateCounters() {
   elements.steps.textContent = String(session.snapshot.steps);
   elements.turns.textContent = String(state.turns);
+  elements.passes.textContent = String(countLiveVisits(session.snapshot.pulse));
 }
 
 function mirrorLabel(x, y, key, fixed = false) {
@@ -61,19 +70,19 @@ function mirrorLabel(x, y, key, fixed = false) {
 
 function renderBoard() {
   const snapshot = session.snapshot;
-  const sourceKey = positionKey(LIVE_LEVEL.source.x, LIVE_LEVEL.source.y);
-  const goalKey = positionKey(LIVE_LEVEL.goal.x, LIVE_LEVEL.goal.y);
+  const sourceKey = positionKey(ACTIVE_LEVEL.source.x, ACTIVE_LEVEL.source.y);
+  const goalKey = positionKey(ACTIVE_LEVEL.goal.x, ACTIVE_LEVEL.goal.y);
   const fragment = document.createDocumentFragment();
   tiles = new Map();
 
   elements.board.style.gridTemplateColumns =
-    "repeat(" + LIVE_LEVEL.width + ", minmax(0, 1fr))";
+    "repeat(" + ACTIVE_LEVEL.width + ", minmax(0, 1fr))";
   elements.board.style.gridTemplateRows =
-    "repeat(" + LIVE_LEVEL.height + ", minmax(0, 1fr))";
-  elements.board.style.aspectRatio = LIVE_LEVEL.width + " / " + LIVE_LEVEL.height;
+    "repeat(" + ACTIVE_LEVEL.height + ", minmax(0, 1fr))";
+  elements.board.style.aspectRatio = ACTIVE_LEVEL.width + " / " + ACTIVE_LEVEL.height;
 
-  for (let y = 0; y < LIVE_LEVEL.height; y += 1) {
-    for (let x = 0; x < LIVE_LEVEL.width; x += 1) {
+  for (let y = 0; y < ACTIVE_LEVEL.height; y += 1) {
+    for (let x = 0; x < ACTIVE_LEVEL.width; x += 1) {
       const key = positionKey(x, y);
       const isMirror = Object.hasOwn(snapshot.mirrors, key);
       const isLive = liveKeys.has(key);
@@ -83,7 +92,7 @@ function renderBoard() {
 
       if (isMirror) {
         tile.classList.add("tile--mirror");
-        if (!isLive) tile.classList.add("tile--fixed");
+        tile.classList.add(isLive ? "tile--live" : "tile--fixed");
         tile.textContent = snapshot.mirrors[key] === "/" ? "╱" : "╲";
         tile.setAttribute("aria-label", mirrorLabel(x, y, key, !isLive));
 
@@ -151,23 +160,27 @@ function syncControls() {
 }
 
 function reset() {
-  session.reset(createMirrorState(LIVE_LEVEL));
+  session.reset(createMirrorState(ACTIVE_LEVEL));
   state.begun = false;
   state.turns = 0;
   renderBoard();
   updateCounters();
   syncControls();
-  setStatus("Begin the run. After that, mirrors can be changed between any two pulse steps.");
+  setStatus(IS_DOUBLE_PASS
+    ? "The gold mirror begins correct for pass one. Advance through it, then flip it before the return."
+    : "Begin the run. After that, mirrors can be changed between any two pulse steps.");
 }
 
 function begin() {
-  session.reset(createMirrorState(LIVE_LEVEL));
+  session.reset(createMirrorState(ACTIVE_LEVEL));
   state.begun = true;
   state.turns = 0;
   renderBoard();
   updateCounters();
   syncControls();
-  setStatus("Step mode active. Rotate any live mirror, then choose Advance one cell.");
+  setStatus(IS_DOUBLE_PASS
+    ? "Double Pass started. Advance through the gold mirror once before rotating it."
+    : "Step mode active. Rotate any live mirror, then choose Advance one cell.");
 }
 
 function advance() {
@@ -187,8 +200,14 @@ function advance() {
         ? "The pulse hit a blocker."
         : "The pulse escaped the board.";
     setStatus(outcome + " Begin a new run and try a different sequence.", "fail");
+  } else if (IS_DOUBLE_PASS &&
+             countLiveVisits(snapshot.pulse) === 1 &&
+             countLiveVisits(before.pulse) === 0) {
+    setStatus("First pass complete! Flip the gold mirror to backslash before the light returns.");
   } else {
-    setStatus("Pulse advanced one cell. Inspect the route, rotate if needed, then advance again.");
+    setStatus("Pulse at column " + (snapshot.pulse.x + 1) +
+      ", row " + (snapshot.pulse.y + 1) +
+      ". Inspect the route, rotate if needed, then advance again.");
   }
 
   syncControls();
@@ -197,7 +216,7 @@ function advance() {
 elements.begin.addEventListener("click", begin);
 elements.advance.addEventListener("click", advance);
 elements.reset.addEventListener("click", reset);
-elements.hint.addEventListener("click", () => setStatus(LIVE_LEVEL.hint));
+elements.hint.addEventListener("click", () => setStatus(ACTIVE_LEVEL.hint));
 
 document.addEventListener("keydown", event => {
   if (event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
@@ -210,4 +229,24 @@ document.addEventListener("keydown", event => {
   }
 });
 
+function configureMode() {
+  if (!IS_DOUBLE_PASS) return;
+  document.title = "Lumen Relay — Double Pass Step Mode";
+  byId("heading-first").textContent = "Double";
+  byId("heading-second").textContent = "Step.";
+  byId("mode-intro").textContent =
+    "The exact Double Pass puzzle, without a clock. Advance one cell at a time. " +
+    "The gold mirror must face slash on its first visit and backslash on its second.";
+  byId("mode-chapter").textContent = "CONTROL TEST 02";
+  byId("mode-subtitle").textContent =
+    "One mirror, two jobs. Make the between-visits change at your own pace.";
+  byId("mode-switch").textContent = "Try Relay Window in step mode";
+  byId("mode-switch").href = "./step-routing.html";
+  byId("live-counterpart").textContent = "Try real-time Double Pass";
+  byId("live-counterpart").href = "./double-pass.html";
+  elements.board.setAttribute("aria-label", "Player-paced Double Pass routing board");
+  byId("passes-wrap").hidden = false;
+}
+
+configureMode();
 reset();
