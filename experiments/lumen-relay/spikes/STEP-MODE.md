@@ -4,7 +4,7 @@ An optional, dependency-free controller for live-routing puzzles. It advances th
 
 ## Engine interface
 
-Provide `initialPulse(level)` and `stepPulse(level, pulse, mirrorState)`. A pulse remains active while `pulse.outcome` is `null`, `undefined`, or `"moving"`; every other outcome locks it until reset.
+Provide `initialPulse(level)` and `stepPulse(level, pulse, mirrorState)`. A pulse remains active while `pulse.outcome` is `null`, `undefined`, or `"moving"`; every other outcome locks it until reset. If an engine uses a different convention, pass `isActive(pulse)` in the engine adapter.
 
 For agent-03's live engine in PR #9, use a small adapter because that engine accepts the mirrors *before* the pulse:
 
