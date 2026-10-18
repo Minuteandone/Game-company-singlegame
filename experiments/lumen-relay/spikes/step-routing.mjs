@@ -177,26 +177,35 @@ function syncControls() {
 }
 
 function reset() {
+  // The board is recreated on reset. If a focused mirror will disappear or
+  // Advance becomes disabled, move keyboard focus to the new Begin action.
+  const focused = document.activeElement;
+  const needsBeginFocus = focused === elements.advance ||
+    (focused?.dataset?.key && liveKeys.has(focused.dataset.key));
   session.reset(createMirrorState(LIVE_LEVEL));
   state.begun = false;
   state.turns = 0;
   renderBoard();
   updateCounters();
   syncControls();
+  if (needsBeginFocus) elements.begin.focus();
   setStatus("Begin the run. After that, mirrors can be changed between any two pulse steps.");
 }
 
 function begin() {
+  const focusAdvance = document.activeElement === elements.begin;
   session.reset(createMirrorState(LIVE_LEVEL));
   state.begun = true;
   state.turns = 0;
   renderBoard();
   updateCounters();
   syncControls();
+  if (focusAdvance) elements.advance.focus();
   setStatus("Step mode active. Rotate any live mirror, then choose Advance one cell.");
 }
 
 function advance() {
+  const focusBeginOnFinish = document.activeElement === elements.advance;
   const before = session.snapshot;
   if (!state.begun || before.pulse.outcome) return;
 
@@ -233,6 +242,7 @@ function advance() {
   }
 
   syncControls();
+  if (snapshot.pulse.outcome && focusBeginOnFinish) elements.begin.focus();
 }
 
 elements.begin.addEventListener("click", begin);
