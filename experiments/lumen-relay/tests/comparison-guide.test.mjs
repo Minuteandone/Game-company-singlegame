@@ -34,6 +34,9 @@ test("comparison guide keeps baseline contextual and links every observation to 
   assert.equal((html.match(/href="\.\/evaluate\.html\?candidate=double-pass"/g) ?? []).length, 2);
   assert.equal((html.match(/href="\.\/evaluate\.html\?candidate=double-pass-step"/g) ?? []).length, 2);
   assert.match(html, /does not choose Continue \/ Mutate \/ Replace/i);
+  assert.match(html, /Attempted, not completed/);
+  assert.match(html, /Sharing a copied report.*optional/i);
+  assert.match(html, /avoid identifying information or private details/i);
 });
 
 test("launcher and repository homepage expose the matched comparison guide", async () => {
