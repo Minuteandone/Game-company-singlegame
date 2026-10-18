@@ -64,7 +64,7 @@ test("the guide asks for real, non-identifying observations and preserves the de
   assert.match(kit, /avoid including identifying information or private details/);
   assert.match(kit, /Attempted, not completed/);
   assert.match(kit, /alternate between Sequence A and Sequence B/);
-  assert.match(kit, /after reading its hint/i);
+  assert.match(kit, /before reading its hint/i);
   assert.match(kit, /https:\/\/github\.com\/Minuteandone\/Game-company-singlegame\/issues\/8/);
   assert.doesNotMatch(kit, /(?<!No )(?:we have chosen|the winner is|results show that)/i);
 });
