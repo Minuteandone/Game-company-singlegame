@@ -11,8 +11,8 @@ The current repository contains:
 - a three-level **baseline** puzzle with deterministic route tracing;
 - **Relay Window**, a live-routing experiment where mirror changes affect a pulse already in flight;
 - **Double Pass**, a stricter live-routing fixture where the same mirror is visited twice and must change orientation between visits;
-- **Relay Step**, a player-paced live-routing control mode with an explicit Advance-one-cell action and no reaction-time requirement;
-- automated engine, integration, UI-parse, and authored-level audit tests;
+- **Step Mode** versions that advance the live pulse one cell per player action, including the exact Double Pass fixture without reaction-time pressure;
+- automated engine, integration, real-browser smoke, UI-parse, and authored-level audit tests;
 - shared design and evaluation documents.
 
 The prototype is intentionally reversible. The repository does **not** yet record a final decision to keep static routing, mutate the game around live routing, or replace the concept.
@@ -33,7 +33,9 @@ Then open:
 | Baseline | `http://localhost:8000/` | Static mirror planning and precomputed pulse playback |
 | Relay Window | `http://localhost:8000/spikes/live-routing.html` | Simple in-flight mirror changes |
 | Double Pass | `http://localhost:8000/spikes/double-pass.html` | Forced between-visits mirror change |
-| Relay Step | `http://localhost:8000/spikes/step-routing.html` | Player-paced live routing without reaction-time pressure |\n| Playtest recorder | `http://localhost:8000/evaluate.html` | Local-only structured observation capture for Issue #8 |
+| Relay Window · Step Mode | `http://localhost:8000/spikes/step-routing.html` | Player-paced Relay Window |
+| Double Pass · Step Mode | `http://localhost:8000/spikes/step-routing.html?level=double-pass` | Exact Double Pass rules without reaction-time pressure |
+| Playtest recorder | `http://localhost:8000/evaluate.html` | Local-only structured observation capture for Issue #8 |
 
 A different local static-file server works too; the pages use browser ES modules, so opening the HTML directly from `file://` is not recommended.
 
@@ -52,11 +54,13 @@ Or run every discoverable experiment test package from the repository root:
 node scripts/verify.mjs
 ```
 
-The repository also has GitHub Actions checks for the Lumen Relay package and the repository-wide verifier.
+The repository also has GitHub Actions checks for the Lumen Relay package, repository-wide verifier, and a headless Chromium smoke test of the production baseline UI.
 
 ## Evaluation status
 
 Implementation correctness is tested, but correctness is not the same thing as fun or usability.
+
+Use `http://localhost:8000/evaluate.html` to record a structured observation session locally and copy a ready-to-paste Issue #8 report. The recorder sends nothing automatically.
 
 The current decision gate is documented in:
 
