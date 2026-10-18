@@ -16,6 +16,7 @@
     .step-variants a{display:inline-flex;padding:10px 14px;border:1px solid #4a7077;border-radius:10px;color:#c7e8e1;text-decoration:none;font-size:14px;font-weight:700}
     .step-variants a:hover,.step-variants a:focus-visible{border-color:#9fead9}
     .step-variants a[aria-current="page"]{background:#17443f;border-color:#85d7c7;color:#fff}
+    .record-link{display:inline-block;margin:2px 0 16px;color:#ffe19a;text-underline-offset:3px}
   </style>
   <script type="module" src="./step-routing.mjs"></script>
 </head>
@@ -35,6 +36,7 @@
           <a data-step-level="relay-window" href="./step-routing.html">Relay Window · Step Mode</a>
           <a data-step-level="double-pass" href="./step-routing.html?level=double-pass">Double Pass · Step Mode</a>
         </nav>
+        <a class="record-link" id="record-this-mode" href="../evaluate.html?candidate=relay-step">Record observations for this exact puzzle →</a>
       </div>
 
       <section class="game-card" aria-label="Step-mode live routing experiment">
