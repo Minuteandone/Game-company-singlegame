@@ -20,3 +20,5 @@ jobs:
           node-version: '22'
       - name: Run available prototype test suites
         run: node scripts/verify.mjs
+      - name: Smoke-test the playable Lumen Relay browser flow
+        run: node scripts/smoke-browser.mjs
